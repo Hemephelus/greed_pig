@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&family=Titan+One&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.pri-font {
+  font-family: "Titan One", cursive;
+}
+
+.sec-font {
+  font-family: 'Raleway', sans-serif;
+}

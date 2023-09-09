@@ -1,5 +1,6 @@
 import React from "react";
 import logo from "../assets/hero-pig-img.png";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -11,9 +12,9 @@ export default function Home() {
 
       <h1 className="pri-font text-3xl sm:text-5xl lg:text-6xl ">Greedy Pig</h1>
       <div>
-      <a href={`/setup/`} className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold duration-300 ">Play</a>
+      <Link to={`/setup`} className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold duration-300 ">Play</Link>
       </div>
-      <a href={`/how-to-play/`} className=" sec-font underline font-semibold ">How to play</a>
+      <Link to={`/how-to-play`} className=" sec-font underline font-semibold ">How to play</Link>
       </div>
     </section>
   );

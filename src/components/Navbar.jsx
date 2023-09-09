@@ -1,5 +1,6 @@
 import React from "react";
 import logo from "../assets/hero-pig-img.png";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
@@ -17,12 +18,12 @@ export default function Navbar() {
       >
         How To Play?
       </a>
-      <a
-        href={`/how-to-play/`}
+      <Link
+        to={`/how-to-play`}
         className=" text-[#ffffff] hover:underline duration-300 font-bold flex text-xl md:hidden"
       >
         ?
-      </a>
+      </Link>
     </nav>
   );
 }

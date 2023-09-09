@@ -2,6 +2,7 @@ import React from "react";
 import BackButton from "../components/BackButton";
 import logo from "../assets/hero-pig-img.png";
 import { AiFillHome } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
 export default function HowToPlay() {
 
@@ -9,12 +10,12 @@ export default function HowToPlay() {
     <div className="p-[5%] flex flex-col relative w-full items-center ">
       <nav className="fixed top-0 w-full flex justify-between p-[5%]">
         <BackButton />
-        <a
-          href={`/setup/`}
+        <Link
+          to={`/setup`}
           className=" bg-[#D30CBD80] hover:bg-[#D30CBD] duration-300 text-white w-[48px] h-[48px] border rounded-full flex items-center justify-around"
         >
           <AiFillHome size={24} />
-        </a>
+        </Link>
       </nav>
 
       <div className="flex flex-col items-center gap-6 lg:gap-12 md:max-w-[70%] xl:max-w-[55%]">

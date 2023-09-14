@@ -1,6 +1,6 @@
 import React from "react";
 import BackButton from "../components/BackButton";
-import logo from "../assets/hero-pig-img.png";
+import logo from "../assets/pig-0.png";
 import { AiFillHome } from "react-icons/ai";
 import { Link } from "react-router-dom";
 

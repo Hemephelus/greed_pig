@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../assets/hero-pig-img.png";
+import logo from "../assets/pig-0.png";
 import { Link } from "react-router-dom";
 
 export default function Home() {

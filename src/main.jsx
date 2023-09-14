@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import Root from "./routes/root";
 import ErrorPage from "./error-page";
-import Setup from "./routes/Setup"
+import Setup from "./routes/setup_game/Setup"
 import Home from "./routes/Home";
 import HowToPlay from "./routes/HowToPlay";
 

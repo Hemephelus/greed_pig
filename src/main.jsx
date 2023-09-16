@@ -4,9 +4,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import Root from "./routes/root";
 import ErrorPage from "./error-page";
-import Setup from "./routes/setup_game/Setup"
+import Setup from "./routes/setup_game/Setup";
 import Home from "./routes/Home";
 import HowToPlay from "./routes/HowToPlay";
+import Game from "./routes/game/Game";
 
 const router = createBrowserRouter([
   {
@@ -26,15 +27,15 @@ const router = createBrowserRouter([
         path: "how-to-play/",
         element: <HowToPlay />,
       },
-      // {
-      //   path: "game/",
-      //   element: < />,
-      // },
+      {
+        path: "game/",
+        element: <Game />,
+      },
       // {
       //   path: "game-over/",
       //   element: < />,
       // },
-    ]
+    ],
   },
 ]);
 

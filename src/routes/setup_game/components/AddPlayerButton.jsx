@@ -1,25 +1,28 @@
 import React, { useState } from "react";
 import { usePlayerDataContext } from "../../../context/usePlayerDataContext";
 import { IoMdAdd } from "react-icons/io";
-import { generateId } from "../../../utils/generateData";
+import {
+  generateId,
+  getRandomIntegersBetween,
+} from "../../../utils/generateData";
 
 export default function AddPlayerButton() {
   const { setPlayerData, playerData } = usePlayerDataContext();
-  const [isMax, setIsMax] = useState(false)
+  const [isMax, setIsMax] = useState(false);
 
   function addPlayer() {
     const numberOfPlayers = Object.keys(playerData).length + 1;
     const newId = generateId();
-        
-    if(numberOfPlayers >= 10){
-        setIsMax(true)
+
+    if (numberOfPlayers >= 10) {
+      setIsMax(true);
     }
 
     let newPlayerData = { ...playerData };
     newPlayerData[newId] = {
       id: newId,
-      avatar: "",
-      tag: `Player ${newId.split('-')[1]}`,
+      avatar: `/src/assets/pig-${getRandomIntegersBetween(0, 8)}.png`,
+      tag: `Player ${newId.split("-")[1]}`,
       name: "",
       running_points: 0,
       total_points: 0,
@@ -28,29 +31,24 @@ export default function AddPlayerButton() {
 
     setPlayerData(newPlayerData);
   }
-  
+
   return (
- <>
- {
-    isMax?(
+    <>
+      {isMax ? (
         <button
-        className=" text-white flex flex-col p-2 gap-1 items-center justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-95 duration-300 "
-        disabled
-        
-      >
-        You have reach the max amount of players
-      </button>
-    ):(
+          className=" text-white flex flex-col p-2 gap-1 items-center justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-95 duration-300 "
+          disabled
+        >
+          You have reach the max amount of players
+        </button>
+      ) : (
         <button
-        className=" text-white flex flex-col p-2 gap-1 items-center justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-95 duration-300 "
-        onClick={addPlayer}
-      >
-        <IoMdAdd size={24} /> <span>Add Player</span>
-      </button>
-    )
- }
- </>
+          className=" text-white flex flex-col p-2 gap-1 items-center justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-95 duration-300 "
+          onClick={addPlayer}
+        >
+          <IoMdAdd size={24} /> <span>Add Player</span>
+        </button>
+      )}
+    </>
   );
 }
-
-

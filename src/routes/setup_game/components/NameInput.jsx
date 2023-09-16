@@ -45,7 +45,7 @@ export default function NameInput({ player }) {
         </button>
 
         <button
-          className={`scale-0 group-hover:scale-100 delay-500 duration-300 text-red-500 bg-slate-50 mt-2 p-1 rounded font-medium absolute max-w-[150px]`}
+          className={`scale-0 group-hover:scale-100 delay-500 duration-300 text-red-500 bg-slate-50 mt-2 p-1 rounded font-medium absolute max-w-[150px] -left-10`}
           onClick={removePlayer}
           disabled={isMin}
         >

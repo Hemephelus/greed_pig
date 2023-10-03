@@ -6,12 +6,13 @@ export function getInitialPlayerData() {
 
   for (let i = 0; i < MIN_PLAYERS; i++) {
     const id = generateId();
-
+    const index = getRandomIntegersBetween(0, 8)
     obj[id] = {
       id: id,
-      avatar: `/src/assets/pig-${getRandomIntegersBetween(0, 8)}.png`,
+      avatar: `/src/assets/pig-${index}.png`,
       tag: `Player ${id.split('-')[1]}`,
       name: "",
+      pig_index: index,
       running_points: 0,
       total_points: 0,
       is_turn: true,

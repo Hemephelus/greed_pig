@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { usePlayerDataContext } from "../../../context/usePlayerDataContext";
+import useSound from 'use-sound';
+import selectSound from '../../../sound_effect/selection_button.mp3'
 
 export default function ImageSlider({ player }) {
+    console.log(player);
   const { preloadSrcList, setPlayerData, playerData } = usePlayerDataContext();
   let pigs = preloadSrcList;
-  const [slideIndex, setSlideIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(player.pig_index);
+
   const nextSlide = () => {
     if (slideIndex !== pigs.length - 1) {
       setSlideIndex(slideIndex + 1);
@@ -40,7 +44,8 @@ export default function ImageSlider({ player }) {
               slideIndex === index ? " opacity-100" : "opacity-0 hidden "
             } w-full duration-500 h-[160px] flex justify-center items-center`}
           >
-            <img src={playerData[player.id]["avatar"]} />
+            {console.log(pig)}
+            <img src={pig} />
           </div>
         );
       })}
@@ -53,10 +58,12 @@ export default function ImageSlider({ player }) {
 }
 
 function BtnSlider({ direction, moveSlide }) {
+    const [play] = useSound(selectSound);
   return (
     <button
       className="w-[50%] p-2  flex justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300 "
-      onClick={moveSlide}
+      onClick={() => {play(); moveSlide()}}
+
     >
       {direction === "next" ? (
         <IoIosArrowForward size={24} />

@@ -13,6 +13,7 @@ export default function AddPlayerButton() {
   function addPlayer() {
     const numberOfPlayers = Object.keys(playerData).length + 1;
     const newId = generateId();
+    const index = getRandomIntegersBetween(0, 8)
 
     if (numberOfPlayers >= 10) {
       setIsMax(true);
@@ -21,9 +22,10 @@ export default function AddPlayerButton() {
     let newPlayerData = { ...playerData };
     newPlayerData[newId] = {
       id: newId,
-      avatar: `/src/assets/pig-${getRandomIntegersBetween(0, 8)}.png`,
+      avatar: `/src/assets/pig-${index}.png`,
       tag: `Player ${newId.split("-")[1]}`,
       name: "",
+      pig_index: index,
       running_points: 0,
       total_points: 0,
       is_turn: true,

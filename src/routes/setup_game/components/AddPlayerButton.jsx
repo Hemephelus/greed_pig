@@ -1,23 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import { usePlayerDataContext } from "../../../context/usePlayerDataContext";
 import { IoMdAdd } from "react-icons/io";
 import {
   generateId,
   getRandomIntegersBetween,
 } from "../../../utils/generateData";
+import selectSound from "../../../sound_effect/add_player.mp3";
+import useAudio from "../../../hooks/useAudio";
 
 export default function AddPlayerButton() {
+  const MAX_NUMBER_OF_PLAYERS = 10
   const { setPlayerData, playerData } = usePlayerDataContext();
-  const [isMax, setIsMax] = useState(false);
+  const audio = useAudio(selectSound);
 
   function addPlayer() {
-    const numberOfPlayers = Object.keys(playerData).length + 1;
+    audio.play()
     const newId = generateId();
-    const index = getRandomIntegersBetween(0, 8)
-
-    if (numberOfPlayers >= 10) {
-      setIsMax(true);
-    }
+    const index = getRandomIntegersBetween(0, 8);
 
     let newPlayerData = { ...playerData };
     newPlayerData[newId] = {
@@ -34,9 +33,13 @@ export default function AddPlayerButton() {
     setPlayerData(newPlayerData);
   }
 
+  function isMax() {
+   return (Object.keys(playerData).length) >= MAX_NUMBER_OF_PLAYERS
+  }
+
   return (
     <>
-      {isMax ? (
+      {isMax() ? (
         <button
           className=" text-white flex flex-col p-2 gap-1 items-center justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-95 duration-300 "
           disabled

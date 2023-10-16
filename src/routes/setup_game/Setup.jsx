@@ -18,6 +18,7 @@ function Setup() {
             <input
               type="number"
               min={25}
+              defaultValue={100}
               className="p-2 bg-[#ffffff20] border rounded-md min-w-[5%] w-[250px]  "
               required
             />

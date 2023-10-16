@@ -5,7 +5,6 @@ import selectSound from '../../../sound_effect/selection_button.mp3'
 import useAudio from "../../../hooks/useAudio";
 
 export default function ImageSlider({ player }) {
-    // console.log(player);
   const { preloadSrcList, setPlayerData, playerData } = usePlayerDataContext();
   let pigs = preloadSrcList;
   const [slideIndex, setSlideIndex] = useState(player.pig_index);
@@ -62,7 +61,7 @@ function BtnSlider({ direction, moveSlide }) {
     const audio = useAudio(selectSound)
   return (
     <button
-      className="w-[50%] p-2  flex justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300 "
+      className="w-[50%] p-2  flex justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-90 duration-[100ms] "
       onClick={() => {audio.play(),moveSlide()}}
 
     >

@@ -15,7 +15,7 @@ import pig7 from "../assets/pig-7.png";
 const preloadSrcList = [pig0, pig1, pig2, pig3, pig4, pig5, pig6, pig7];
 
 function Root() {
-  const [playerData, setPlayerData] = useState(getInitialPlayerData);
+  const [game, setGame] = useState(getInitialPlayerData);
   const { imagesPreloaded } = useImagePreloader(preloadSrcList);
   if (!imagesPreloaded) {
     return (

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { usePlayerDataContext } from "../../../context/usePlayerDataContext";
 import { IoMdMore } from "react-icons/io";
+import selectSound from '../../../sound_effect/remove_player.mp3'
+import useAudio from "../../../hooks/useAudio";
 
 export default function NameInput({ player }) {
+  const audio = useAudio(selectSound)
   const { setPlayerData, playerData } = usePlayerDataContext();
   const [isMin, setIsMin] = useState(false);
 
@@ -23,6 +26,7 @@ export default function NameInput({ player }) {
   }
 
   function removePlayer() {
+    audio.play()
     let newPlayerData = { ...playerData };
     delete newPlayerData[player.id];
     setPlayerData(newPlayerData);

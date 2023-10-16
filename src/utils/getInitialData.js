@@ -28,3 +28,16 @@ let a = {
 
 }
 
+export function getInitialGameData() {
+  return {
+    settings:{
+      isAudioOn: true,
+    },
+    resets:{
+      
+    }
+  }
+
+  
+}
+

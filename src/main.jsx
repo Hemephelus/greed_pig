@@ -4,10 +4,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import Root from "./routes/root";
 import ErrorPage from "./error-page";
-import Setup from "./routes/setup_game/Setup";
+import LiveGameSetup from "./routes/play_friends_live/setup/Setup";
 import Home from "./routes/Home";
 import HowToPlay from "./routes/HowToPlay";
-import Game from "./routes/game/Game";
+import LiveGame from "./routes/play_friends_live/game/Game";
+import LiveGamePage from "./routes/play_friends_live/LivePage";
 
 const router = createBrowserRouter([
   {
@@ -16,9 +17,23 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "setup/",
-        element: <Setup />,
-      },
+        path: "live-game/",
+        element: <LiveGamePage />,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: "setup/",
+            element: <LiveGameSetup />,
+          },
+          {
+            path: "game/",
+            element: <LiveGame />,
+          },
+          // {
+          //   path: "game-over/",
+          //   element: < />,
+          // },
+        ]},
       {
         path: "/",
         element: <Home />,
@@ -27,14 +42,6 @@ const router = createBrowserRouter([
         path: "how-to-play/",
         element: <HowToPlay />,
       },
-      {
-        path: "game/",
-        element: <Game />,
-      },
-      // {
-      //   path: "game-over/",
-      //   element: < />,
-      // },
     ],
   },
 ]);

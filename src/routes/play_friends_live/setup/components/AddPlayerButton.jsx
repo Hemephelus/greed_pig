@@ -1,27 +1,26 @@
 import React from "react";
-import { usePlayerDataContext } from "../../../context/useLiveGameContext";
+import { useLiveGameContext } from "src/context/useLiveGameContext";
 import { IoMdAdd } from "react-icons/io";
 import {
   generateId,
-  getRandomIntegersBetween,
-} from "../../../utils/generateData";
-import addPlayerSound from "../../../sound_effect/add_player.mp3";
-import invalidSound from "../../../sound_effect/invalid.mp3";
-import useAudio from "../../../hooks/useAudio";
+} from "src/utils/generateData";
+import addPlayerSound from "src/sound_effect/add_player.mp3";
+import invalidSound from "src/sound_effect/invalid.mp3";
+import useAudio from "src/hooks/useAudio";
 
 export default function AddPlayerButton() {
-  const MAX_NUMBER_OF_PLAYERS = 10
-  const { setPlayerData, playerData } = usePlayerDataContext();
+  const MAX_NUMBER_OF_PLAYERS = 8
+  const { setPlayerData, playerData } = useLiveGameContext();
   const invalidAudio = useAudio(invalidSound);
   const addPlayerAudio = useAudio(addPlayerSound);
 
   function addPlayer() {
     addPlayerAudio.play()
     const newId = generateId();
-    const index = getRandomIntegersBetween(0, 8);
+    const index = playerData.length
 
-    let newPlayerData = { ...playerData };
-    newPlayerData[newId] = {
+    let newPlayerData = [...playerData];
+    newPlayerData.push( {
       id: newId,
       avatar: `/src/assets/pig-${index}.png`,
       tag: `Player ${newId.split("-")[1]}`,
@@ -30,7 +29,7 @@ export default function AddPlayerButton() {
       running_points: 0,
       total_points: 0,
       is_turn: true,
-    };
+    });
 
     setPlayerData(newPlayerData);
   }

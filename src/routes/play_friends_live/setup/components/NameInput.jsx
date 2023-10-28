@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { usePlayerDataContext } from "../../../context/useLiveGameContext";
+import { useLiveGameContext } from "src/context/useLiveGameContext";
 import { IoMdMore } from "react-icons/io";
-import selectSound from '../../../sound_effect/remove_player.mp3'
-import useAudio from "../../../hooks/useAudio";
+import selectSound from 'src/sound_effect/remove_player.mp3'
+import useAudio from "src/hooks/useAudio";
 
-export default function NameInput({ player }) {
+export default function NameInput({ player,index }) {
   const audio = useAudio(selectSound)
-  const { setPlayerData, playerData } = usePlayerDataContext();
+  const { setPlayerData, playerData } = useLiveGameContext();
   const [isMin, setIsMin] = useState(false);
 
   useEffect(() => {
-    const numberOfPlayers = Object.keys(playerData).length;
+    const numberOfPlayers = playerData.length;
     if (numberOfPlayers < 3) {
       setIsMin(true);
       return;
@@ -20,15 +20,15 @@ export default function NameInput({ player }) {
 
   function handleChange(e) {
     const name = e.target.value;
-    let newPlayerData = { ...playerData };
-    newPlayerData[player.id]["name"] = name;
+    let newPlayerData = [...playerData] ;
+    newPlayerData[index]["name"] = name;
     setPlayerData(newPlayerData);
   }
 
   function removePlayer() {
     audio.play()
-    let newPlayerData = { ...playerData };
-    delete newPlayerData[player.id];
+    let newPlayerData = [ ...playerData ];
+    newPlayerData.splice(index,1)
     setPlayerData(newPlayerData);
   }
 

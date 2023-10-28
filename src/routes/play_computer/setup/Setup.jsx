@@ -1,5 +1,5 @@
 import Navbar from "../../components/Navbar";
-import { usePlayerDataContext } from "../../context/useLiveGameContext";
+import { usePlayerDataContext } from "../../context/usePlayerDataContext";
 import AddPlayerButton from "./components/AddPlayerButton";
 import NameInput from "./components/NameInput";
 import ImageSlider from "./components/ImageSlider";

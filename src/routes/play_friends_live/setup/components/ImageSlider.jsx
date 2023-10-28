@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { usePlayerDataContext } from "../../../context/useLiveGameContext";
-import selectSound from '../../../sound_effect/selection_button.mp3'
-import useAudio from "../../../hooks/useAudio";
+import { useLiveGameContext } from "src/context/useLiveGameContext";
+import selectSound from 'src/sound_effect/selection_button.mp3'
+import useAudio from "src/hooks/useAudio";
+import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 
-export default function ImageSlider({ player }) {
-  const { preloadSrcList, setPlayerData, playerData } = usePlayerDataContext();
-  let pigs = preloadSrcList;
+export default function ImageSlider({ player, index }) {
+  const { setPlayerData, playerData } = useLiveGameContext();
+  const { preloadSrcList } = useGreedyPigContext();
+  let pigs = preloadSrcList.slice(0,8);
   const [slideIndex, setSlideIndex] = useState(player.pig_index);
 
   const nextSlide = () => {
@@ -16,8 +18,8 @@ export default function ImageSlider({ player }) {
       setSlideIndex(0);
     }
 
-    let newPlayerData = { ...playerData };
-    newPlayerData[player.id]["avatar"] = pigs[slideIndex];
+    let newPlayerData = [ ...playerData ];
+    newPlayerData[index]["avatar"] = pigs[slideIndex];
     setPlayerData(newPlayerData);
   };
 
@@ -28,8 +30,8 @@ export default function ImageSlider({ player }) {
       setSlideIndex(pigs.length - 1);
     }
 
-    let newPlayerData = { ...playerData };
-    newPlayerData[player.id]["avatar"] = pigs[slideIndex];
+    let newPlayerData = [ ...playerData ];
+    newPlayerData[index]["avatar"] = pigs[slideIndex];
     setPlayerData(newPlayerData);
   };
 
@@ -43,7 +45,7 @@ export default function ImageSlider({ player }) {
               slideIndex === index ? " opacity-100" : "opacity-0 hidden "
             } w-full duration-500 h-[160px] flex justify-center items-center`}
           >
-            {/* {console.log(pig)} */}
+           
             <img src={pig} />
           </div>
         );
@@ -57,7 +59,6 @@ export default function ImageSlider({ player }) {
 }
 
 function BtnSlider({ direction, moveSlide }) {
-    // const [play] = useSound(selectSound);
     const audio = useAudio(selectSound)
   return (
     <button

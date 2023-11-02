@@ -1,8 +1,14 @@
-# React + Vite
+# To Do's
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. work on the game over screen(celebration animation).
+2. work on the reset state
+3. include new pigs to the game
+4. work on the floating points screen
+5. get favicon
+6. work on scroll bar
+7. work on mobile view
+8. Implement history for the undo snd redo buttons
+9. rethink state management
+10. Not started the player with computer version
+11. Not started the remote versions
+12. look into realtime gaming

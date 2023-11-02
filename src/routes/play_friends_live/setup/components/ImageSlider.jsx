@@ -8,7 +8,7 @@ import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 export default function ImageSlider({ player, index }) {
   const { setPlayerData, playerData } = useLiveGameContext();
   const { preloadSrcList } = useGreedyPigContext();
-  let pigs = preloadSrcList.slice(0,8);
+  let pigs = preloadSrcList.slice(0,9);
   const [slideIndex, setSlideIndex] = useState(player.pig_index);
 
   const nextSlide = () => {
@@ -32,6 +32,7 @@ export default function ImageSlider({ player, index }) {
 
     let newPlayerData = [ ...playerData ];
     newPlayerData[index]["avatar"] = pigs[slideIndex];
+    console.log(pigs[slideIndex],newPlayerData);
     setPlayerData(newPlayerData);
   };
 

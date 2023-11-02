@@ -1,4 +1,3 @@
-import { Form, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Dice } from "src/components/Dice";
 import Navbar from "src/components/Navbar";
@@ -24,6 +23,7 @@ export default function LiveGame() {
   const addPlayerAudio = useAudio(addPlayerSound);
 
   const handlePassClick = () => {
+    if(isRolling)return
     // If successful, update the isCopied state value
     addPlayerAudio.play();
     let cp = currentPlayer
@@ -36,8 +36,7 @@ export default function LiveGame() {
     cp = (currentPlayer + 1 ) % playerData.length;
     setCurrentPlayer(cp);
   };
-  //  navigate("/auth/login");
-  //  const navigate = useNavigate();
+  
 
   return (
     <div className="grid grid-cols-[auto_1fr_minmax(auto,_300px)]">
@@ -50,6 +49,7 @@ export default function LiveGame() {
           currentPlayer={currentPlayer}
           playerData={playerData}
           setPlayerData={setPlayerData}
+          maxPoints={maxPoints}
         />
         <a
           href={"#" + (currentPlayer) % playerData.length}

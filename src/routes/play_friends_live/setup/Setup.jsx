@@ -6,7 +6,7 @@ import ImageSlider from "./components/ImageSlider";
 import { Link } from "react-router-dom";
 
 function LiveGameSetup() {
-  const { playerData, setCurrentPlayer } = useLiveGameContext();
+  const { playerData, maxPoints, setMaxPoints } = useLiveGameContext();
 
   return (
     <>
@@ -18,12 +18,12 @@ function LiveGameSetup() {
             <input
               type="number"
               min={25}
-              defaultValue={100}
+              value={maxPoints}
+              onChange={(e) => {setMaxPoints(e.target.value)}}
               className="p-2 bg-[#ffffff20] border rounded-md min-w-[5%] w-[250px]  "
               required
             />
-          </section>
-          <button>Reset</button>
+          </section>  
           <section className="max-h-[400px] w-full overflow-y-auto bg-[#ffffff10] border rounded-lg p-4 grid grid-cols-fluid justify-center gap-4">
           
             {[...playerData].map((player,index) => (

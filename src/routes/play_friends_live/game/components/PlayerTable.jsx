@@ -23,8 +23,8 @@ function PlayerTable({playerData, currentPlayer}) {
                     : ""
                 } w-full p-2 rounded-lg bg-[#ffffff10] border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300 scroll-mt-[300px] `}
               >
-                <td className="h-[100px] p-2 grid place-content-center">
-                  <figure className="w-[70px] bg-[#ffffff20] p-2 border border-[#FFFF8F40] rounded">
+                <td className="h-[70px] p-2 grid place-content-center">
+                  <figure className="w-[50px] bg-[#ffffff20] p-2 border border-[#FFFF8F40] rounded">
                     <img src={player.avatar} alt={player.tag} />
                   </figure>
                 </td>

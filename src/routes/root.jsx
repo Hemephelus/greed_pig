@@ -9,6 +9,7 @@ import pig4 from "src/assets/pig-4.png";
 import pig5 from "src/assets/pig-5.png";
 import pig6 from "src/assets/pig-6.png";
 import pig7 from "src/assets/pig-7.png";
+import pig8 from "src/assets/pig-8.png";
 import dice1 from "src/assets/dice_1.png";
 import dice2 from "src/assets/dice_2.png";
 import dice3 from "src/assets/dice_3.png";
@@ -25,6 +26,7 @@ const preloadSrcList = [
   pig5,
   pig6,
   pig7,
+  pig8,
   dice1,
   dice2,
   dice3,

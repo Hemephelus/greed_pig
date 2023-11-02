@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import diceRollSound from "src/sound_effect/dice_roll.mp3";
 import loseSound from "src/sound_effect/lose_sound.mp3";
 import useAudio from "src/hooks/useAudio";
+
 
 export function Dice({
   getFinalDiceValue,
@@ -12,10 +14,12 @@ export function Dice({
   setCurrentPlayer,
   playerData,
   setPlayerData,
+  maxPoints,
 }) {
   const { preloadSrcList } = useGreedyPigContext();
+  const navigate = useNavigate();
   const [currentDice, setCurrentDice] = useState(0);
-  const dice = preloadSrcList.slice(8);
+  const dice = preloadSrcList.slice(9);
   const diceRollAudio = useAudio(diceRollSound);
   const loseAudio = useAudio(loseSound);
 
@@ -36,6 +40,11 @@ export function Dice({
           endRoll++;
           setCurrentDice(r);
         } else {
+          let currentPoint = playerData[currentPlayer].running_points + playerData[currentPlayer].total_points + r
+          if(currentPoint >= maxPoints){
+            console.log('lol');
+             navigate("/live-game/setup");
+          }
           let cp = currentPlayer;
           let newPlayerData = [...playerData];
 

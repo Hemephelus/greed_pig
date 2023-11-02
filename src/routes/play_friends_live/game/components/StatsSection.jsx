@@ -6,7 +6,6 @@ function StatsSection({ playerData, currentPlayer }) {
     let newLeaderBoard = [...playerData].sort(
       (a, b) => (b.total_points + b.running_points) - (a.total_points + a.running_points)
     );
-    console.log(newLeaderBoard);
     setLeaderBoard(newLeaderBoard);
   }, [playerData,currentPlayer]);
 

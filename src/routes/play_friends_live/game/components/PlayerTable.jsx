@@ -28,13 +28,13 @@ function PlayerTable({playerData, currentPlayer}) {
                     <img src={player.avatar} alt={player.tag} />
                   </figure>
                 </td>
-                <td className=" text-center text-2xl text-white">
+                <td className=" text-center text-xl text-white">
                   {player.name}
                 </td>
-                <td className=" text-center text-2xl text-white">
+                <td className=" text-center text-xl text-white">
                   {player.total_points + player.running_points}
                 </td>
-                <td className=" text-center text-2xl text-white">
+                <td className=" text-center text-xl text-white">
                   {player.running_points}
                 </td>
               </tr>

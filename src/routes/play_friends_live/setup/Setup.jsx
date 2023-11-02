@@ -3,10 +3,35 @@ import { useLiveGameContext } from "src/context/useLiveGameContext";
 import AddPlayerButton from "./components/AddPlayerButton";
 import NameInput from "./components/NameInput";
 import ImageSlider from "./components/ImageSlider";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 
 function LiveGameSetup() {
-  const { playerData, maxPoints, setMaxPoints } = useLiveGameContext();
+  const { playerData, maxPoints, setMaxPoints, setPlayerData, setDiceValue, setIsGameOver, setCurrentPlayer } =
+    useLiveGameContext();
+  const navigate = useNavigate();
+
+  function setupPlayers() {
+    let newPlayerData = playerData.map((player) => {
+      let newPlayer = {
+        ...player,
+        running_points: 0,
+        total_points: 0,
+      };
+      return newPlayer;
+    });
+
+
+    setDiceValue(0)
+    setIsGameOver(false)
+    setCurrentPlayer(0)
+    setPlayerData(newPlayerData);
+    navigate("/live-game/game");
+  }
+
+  function clearsPlayers() {
+    setPlayerData(getInitialPlayerData());
+  }
 
   return (
     <>
@@ -19,26 +44,41 @@ function LiveGameSetup() {
               type="number"
               min={25}
               value={maxPoints}
-              onChange={(e) => {setMaxPoints(e.target.value)}}
+              onChange={(e) => {
+                setMaxPoints(e.target.value);
+              }}
               className="p-2 bg-[#ffffff20] border rounded-md min-w-[5%] w-[250px]  "
               required
             />
-          </section>  
-          <section className="max-h-[400px] w-full overflow-y-auto bg-[#ffffff10] border rounded-lg p-4 grid grid-cols-fluid justify-center gap-4">
-          
-            {[...playerData].map((player,index) => (
-              <div
-                key={player.id}
-                className=" flex flex-col w-full items-center  gap-2 p-2 rounded-lg border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300">
-                <NameInput player={player} index={index} />
-                <ImageSlider player={player} index={index}/>
-              </div>
-            ))}
-
-            <AddPlayerButton />
           </section>
+          <div className=" w-full  gap-2 flow-root">
+            <section className="max-h-[350px] w-full overflow-y-auto bg-[#ffffff10] border rounded-lg p-4 grid grid-cols-fluid justify-center gap-4">
+              {[...playerData].map((player, index) => (
+                <div
+                  key={player.id}
+                  className=" flex flex-col w-full items-center  gap-2 p-2 rounded-lg border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300"
+                >
+                  <NameInput player={player} index={index} />
+                  <ImageSlider player={player} index={index} />
+                </div>
+              ))}
+
+              <AddPlayerButton />
+            </section>
+            <button
+              className="text-right text-xs p-2 bg-[#D30C0C40] text-[#ffffff] w-fit border border-[#D30C0C80] duration-300 hover:bg-[#D30C0C80]   hover:border-[#D30C0C] rounded float-right mt-2"
+              onClick={clearsPlayers}
+            >
+              Clear Players
+            </button>
+          </div>
           <section>
-          <Link to={`/live-game/game`} className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold duration-300 ">Start Game</Link>
+            <button
+              onClick={setupPlayers}
+              className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold duration-300 "
+            >
+              Start Game
+            </button>
           </section>
         </div>
       </main>

@@ -12,27 +12,34 @@ export default function ImageSlider({ player, index }) {
   const [slideIndex, setSlideIndex] = useState(player.pig_index);
 
   const nextSlide = () => {
+    let  newSlideIndex
     if (slideIndex !== pigs.length - 1) {
-      setSlideIndex(slideIndex + 1);
+      newSlideIndex =  slideIndex + 1
+      setSlideIndex(newSlideIndex);
     } else if (slideIndex === pigs.length - 1) {
-      setSlideIndex(0);
+      newSlideIndex = 0
+      setSlideIndex(newSlideIndex);
     }
 
     let newPlayerData = [ ...playerData ];
-    newPlayerData[index]["avatar"] = pigs[slideIndex];
+    newPlayerData[index]["avatar"] = pigs[newSlideIndex];
+    newPlayerData[index]["pig_index"] = newSlideIndex;
     setPlayerData(newPlayerData);
   };
 
   const prevSlide = () => {
+   let  newSlideIndex
     if (slideIndex !== 0) {
-      setSlideIndex(slideIndex - 1);
+      newSlideIndex = slideIndex - 1
+      setSlideIndex(newSlideIndex);
     } else if (slideIndex === 0) {
-      setSlideIndex(pigs.length - 1);
+      newSlideIndex = pigs.length - 1
+      setSlideIndex(newSlideIndex);
     }
 
     let newPlayerData = [ ...playerData ];
-    newPlayerData[index]["avatar"] = pigs[slideIndex];
-    console.log(pigs[slideIndex],newPlayerData);
+    newPlayerData[index]["avatar"] = pigs[newSlideIndex];
+    newPlayerData[index]["pig_index"] = newSlideIndex;
     setPlayerData(newPlayerData);
   };
 

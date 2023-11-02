@@ -1,10 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import diceRollSound from "src/sound_effect/dice_roll.mp3";
 import loseSound from "src/sound_effect/lose_sound.mp3";
+import celebrationSound from "src/sound_effect/celebration.mp3";
 import useAudio from "src/hooks/useAudio";
-
 
 export function Dice({
   getFinalDiceValue,
@@ -15,13 +14,14 @@ export function Dice({
   playerData,
   setPlayerData,
   maxPoints,
+  setIsGameOver,
 }) {
   const { preloadSrcList } = useGreedyPigContext();
-  const navigate = useNavigate();
   const [currentDice, setCurrentDice] = useState(0);
   const dice = preloadSrcList.slice(9);
   const diceRollAudio = useAudio(diceRollSound);
   const loseAudio = useAudio(loseSound);
+  const celebrationAudio = useAudio(celebrationSound);
 
   const handleDiceClick = () => {
     // If successful, update the isCopied state value
@@ -40,11 +40,7 @@ export function Dice({
           endRoll++;
           setCurrentDice(r);
         } else {
-          let currentPoint = playerData[currentPlayer].running_points + playerData[currentPlayer].total_points + r
-          if(currentPoint >= maxPoints){
-            console.log('lol');
-             navigate("/live-game/setup");
-          }
+          
           let cp = currentPlayer;
           let newPlayerData = [...playerData];
 
@@ -54,8 +50,17 @@ export function Dice({
             cp = (currentPlayer + 1) % playerData.length;
             setCurrentPlayer(cp);
           } else {
+            setGameOverPage(
+              r,
+              playerData,
+              currentPlayer,
+              maxPoints,
+              setIsGameOver,
+              celebrationAudio
+            );
             newPlayerData[cp]["running_points"] += r + 1;
             setPlayerData(newPlayerData);
+  
           }
 
           clearInterval(interval);
@@ -77,4 +82,33 @@ export function Dice({
       </button>
     </>
   );
+}
+
+function setGameOverPage(
+  r,
+  playerData,
+  currentPlayer,
+  maxPoints,
+  setIsGameOver,
+  celebrationAudio
+) {
+  let currentPoint =
+    playerData[currentPlayer].running_points +
+    playerData[currentPlayer].total_points +
+    r +
+    1;
+  let interval
+  let endRoll = 0
+
+  if (currentPoint >= maxPoints) {
+    interval = setInterval(() => {
+      if (endRoll < 20) {
+        endRoll++;
+      } else {
+        celebrationAudio.play()
+        setIsGameOver(true);
+        clearInterval(interval);
+      }
+    }, 100);
+  }
 }

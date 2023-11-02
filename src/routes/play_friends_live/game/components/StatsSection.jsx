@@ -14,7 +14,7 @@ function StatsSection({ playerData, currentPlayer }) {
     <section className="h-screen border-l-[#ffffff40] border-l sticky top-0 grid grid-rows-[auto_auto_1fr] bg-[#00000010] text-[#F9F7E8] overflow-auto">
       <div className=" h-[250px] flex flex-col items-center justify-center gap-2">
         <figure
-          className={` w-[150px] h-[150px] flex justify-center items-center bg-[#ffffff] p-2 rounded-lg`}
+          className={` w-[150px] h-[150px] flex justify-center items-center bg-[#ffffff20] p-2 rounded-lg border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300`}
         >
           <img src={playerData[currentPlayer].avatar} />
         </figure>

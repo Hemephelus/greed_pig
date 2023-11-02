@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dice } from "src/components/Dice";
 import Navbar from "src/components/Navbar";
 import { useLiveGameContext } from "src/context/useLiveGameContext";
@@ -7,6 +7,7 @@ import addPlayerSound from "src/sound_effect/add_player.mp3";
 import useAudio from "src/hooks/useAudio";
 import PlayerTable from "./components/PlayerTable";
 import StatsSection from "./components/StatsSection";
+import GameOver from "./GameOver";
 
 export default function LiveGame() {
   const {
@@ -18,25 +19,25 @@ export default function LiveGame() {
     currentPlayer,
     setCurrentPlayer,
     maxPoints,
-    
+    setIsGameOver,
+    isGameOver,
   } = useLiveGameContext();
   const addPlayerAudio = useAudio(addPlayerSound);
 
   const handlePassClick = () => {
-    if(isRolling)return
+    if (isRolling) return;
     // If successful, update the isCopied state value
     addPlayerAudio.play();
-    let cp = currentPlayer
+    let cp = currentPlayer;
     let newPlayerData = [...playerData];
-    
+
     newPlayerData[cp]["total_points"] += newPlayerData[cp]["running_points"];
     newPlayerData[cp]["running_points"] = 0;
     setPlayerData(newPlayerData);
-    
-    cp = (currentPlayer + 1 ) % playerData.length;
+
+    cp = (currentPlayer + 1) % playerData.length;
     setCurrentPlayer(cp);
   };
-  
 
   return (
     <div className="grid grid-cols-[auto_1fr_minmax(auto,_300px)]">
@@ -50,9 +51,10 @@ export default function LiveGame() {
           playerData={playerData}
           setPlayerData={setPlayerData}
           maxPoints={maxPoints}
+          setIsGameOver={setIsGameOver}
         />
         <a
-          href={"#" + (currentPlayer) % playerData.length}
+          href={"#" + (currentPlayer % playerData.length)}
           className="bg-[#056FA4c0] w-full  text-white text-center text-2xl font-semibold py-4 rounded-lg border hover:scale-105 active:scale-100 duration-300"
           onClick={handlePassClick}
         >
@@ -66,10 +68,15 @@ export default function LiveGame() {
       </div>
       <div className=" space-y-2 p-2">
         <Navbar />
-        <PlayerTable playerData={playerData} currentPlayer={currentPlayer}/>
+        <PlayerTable playerData={playerData} currentPlayer={currentPlayer} />
       </div>
-     
-      <StatsSection playerData={playerData} currentPlayer={currentPlayer}/>
+
+      <StatsSection playerData={playerData} currentPlayer={currentPlayer} />
+      {isGameOver ? (
+        <GameOver playerData={playerData} currentPlayer={currentPlayer} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

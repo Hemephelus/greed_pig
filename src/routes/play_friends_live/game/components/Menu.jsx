@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 function Menu() {
   return (
     <div className="group flex flex-col items-center gap-2 hover:cursor-pointer text-sm">
-      <div className="flex flex-col gap-2 group-hover:scale-100 scale-0 delay-300 duration-500 bg-[#D30CBD40] p-2 rounded-lg">
+      <div className="flex  gap-2 group-hover:scale-100 scale-0 delay-300 duration-500 bg-[#D30CBD40] p-2 rounded-lg">
         <div className="grid grid-cols-2 gap-2">
           <button
             className=" bg-[#ffffff20] hover:bg-[#ffffff40] text-white rounded-lg flex flex-col gap-2 p-2  justify-center items-center hover:scale-105 active:scale-100 duration-300"

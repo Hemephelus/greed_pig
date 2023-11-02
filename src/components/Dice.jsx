@@ -36,16 +36,16 @@ export function Dice({
           endRoll++;
           setCurrentDice(r);
         } else {
-
-          let cp = currentPlayer % playerData.length;
+          let cp = currentPlayer;
           let newPlayerData = [...playerData];
 
           if (r === 0) {
             loseAudio.play();
             newPlayerData[cp]["running_points"] = r;
-            setCurrentPlayer(currentPlayer + 1);
+            cp = (currentPlayer + 1) % playerData.length;
+            setCurrentPlayer(cp);
           } else {
-            newPlayerData[cp]["running_points"] += (r+1);
+            newPlayerData[cp]["running_points"] += r + 1;
             setPlayerData(newPlayerData);
           }
 

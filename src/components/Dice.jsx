@@ -18,7 +18,7 @@ export function Dice({
 }) {
   const { preloadSrcList } = useGreedyPigContext();
   const [currentDice, setCurrentDice] = useState(0);
-  const dice = preloadSrcList.slice(9);
+  const die = preloadSrcList.slice(9);
   const diceRollAudio = useAudio(diceRollSound);
   const loseAudio = useAudio(loseSound);
   const celebrationAudio = useAudio(celebrationSound);
@@ -78,7 +78,12 @@ export function Dice({
         onClick={handleDiceClick}
         disabled={isRolling}
       >
-        <img src={dice[currentDice]} alt={currentDice + 1} />
+      {
+        die.map((dice, index) => (
+          <img src={dice} alt={currentDice + 1} className={`${currentDice === index?'':'hidden'}`} />
+        ))
+      }
+        
       </button>
     </>
   );

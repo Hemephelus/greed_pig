@@ -3,7 +3,7 @@ import { HiOutlineMenu } from "react-icons/hi";
 import { BiUndo, BiRedo } from "react-icons/bi";
 import { GoTools } from "react-icons/go";
 import { Link } from "react-router-dom";
-import SoundSwitch from "src/components/soundSwitch";
+import SoundSwitch from "src/components/SoundSwitch";
 
 function Menu() {
   return (

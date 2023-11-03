@@ -5,11 +5,22 @@ import NameInput from "./components/NameInput";
 import ImageSlider from "./components/ImageSlider";
 import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
+import SoundSwitch from "src/components/soundSwitch";
+import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 
 function LiveGameSetup() {
-  const { playerData, maxPoints, setMaxPoints, setPlayerData, setDiceValue, setIsGameOver, setCurrentPlayer } =
-    useLiveGameContext();
+  const {
+    playerData,
+    maxPoints,
+    setMaxPoints,
+    setPlayerData,
+    setDiceValue,
+    setIsGameOver,
+    setCurrentPlayer,
+  } = useLiveGameContext();
   const navigate = useNavigate();
+  const { preloadSrcList, pigPetNames } = useGreedyPigContext();
+  const pigs = preloadSrcList.filter(pig => pig.includes('pig'))
 
   function setupPlayers() {
     let newPlayerData = playerData.map((player) => {
@@ -21,16 +32,15 @@ function LiveGameSetup() {
       return newPlayer;
     });
 
-
-    setDiceValue(0)
-    setIsGameOver(false)
-    setCurrentPlayer(0)
+    setDiceValue(0);
+    setIsGameOver(false);
+    setCurrentPlayer(0);
     setPlayerData(newPlayerData);
     navigate("/live-game/game");
   }
 
   function clearsPlayers() {
-    setPlayerData(getInitialPlayerData());
+    setPlayerData(getInitialPlayerData(pigs,pigPetNames));
   }
 
   return (
@@ -71,6 +81,7 @@ function LiveGameSetup() {
             >
               Clear Players
             </button>
+            <SoundSwitch/>
           </div>
           <section>
             <button

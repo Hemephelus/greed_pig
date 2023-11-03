@@ -18,7 +18,8 @@ function StatsSection({ playerData, currentPlayer }) {
         >
           <img src={playerData[currentPlayer].avatar} />
         </figure>
-        {playerData[currentPlayer].name}'s Turn
+        {playerData[currentPlayer].name === ''?playerData[currentPlayer].tag:playerData[currentPlayer].name}'s Turn
+        
       </div>
       <div className="bg-[#ffffff10]  text-2xl font-extrabold border-y border-[#ffffff80] py-4 text-center ">
         Leaderboard
@@ -45,7 +46,7 @@ function StatsSection({ playerData, currentPlayer }) {
                     <img src={player.avatar} />
                   </figure>
                 </td>
-                <td className=" ">{player.name}</td>
+                <td className=" "> {player.name === ''?player.tag:player.name}</td>
                 <td className="  ">
                   {player.total_points + player.running_points}
                 </td>

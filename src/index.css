@@ -11,3 +11,17 @@
 .sec-font {
   font-family: 'Raleway', sans-serif;
 }
+
+::-webkit-scrollbar {
+  /* Customize the scrollbar width */
+  width: 0px;
+}
+
+::-webkit-scrollbar-track {
+  /* Customize the scrollbar track */
+  width: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+  /* Customize the scrollbar thumb */
+}

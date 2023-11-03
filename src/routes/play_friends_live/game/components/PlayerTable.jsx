@@ -11,11 +11,11 @@ function PlayerTable({playerData, currentPlayer}) {
               <th className=" text-center text-white">Running Points</th>
             </tr>
           </thead>
-
+       
           <tbody>
-            {Object.values(playerData)?.map((player, index) => (
+            {playerData?.map((player, index) => (
               <tr
-                key={player.id}
+                key={index}
                 id={index}
                 className={`${
                   index === currentPlayer % playerData.length
@@ -25,11 +25,11 @@ function PlayerTable({playerData, currentPlayer}) {
               >
                 <td className="h-[70px] p-2 grid place-content-center">
                   <figure className="w-[50px] bg-[#ffffff20] p-2 border border-[#FFFF8F40] rounded">
-                    <img src={player.avatar} alt={player.tag} />
+                    <img src={player.avatar} alt={player.avatar} />
                   </figure>
                 </td>
                 <td className=" text-center text-xl text-white">
-                  {player.name}
+                  {player.name === ''?player.tag:player.name}
                 </td>
                 <td className=" text-center text-xl text-white">
                   {player.total_points + player.running_points}

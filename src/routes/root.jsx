@@ -16,6 +16,8 @@ import dice3 from "src/assets/dice_3.png";
 import dice4 from "src/assets/dice_4.png";
 import dice5 from "src/assets/dice_5.png";
 import dice6 from "src/assets/dice_6.png";
+import { useState } from "react";
+import { getPigPetNames } from "src/utils/getPigPetNames";
 
 const preloadSrcList = [
   pig0,
@@ -34,9 +36,12 @@ const preloadSrcList = [
   dice5,
   dice6,
 ];
+const pigPetNames = getPigPetNames();
+
 
 function Root() {
   const { imagesPreloaded } = useImagePreloader(preloadSrcList);
+  const [hasSound, setHasSound] = useState(true);
   if (!imagesPreloaded) {
     return (
       <>
@@ -54,7 +59,9 @@ function Root() {
       <main className="bg-[#111111] min-h-screen min-w-full relative z-10 sec-font ">
         <div className=" rounded-full bg-[#056FA4] blur-[500px] md:blur-[845px] w-[800px] h-[800px] -z-10 fixed -bottom-[700px] -left-[700px] md:-bottom-96 md:-left-96"></div>
         <div className=" rounded-full bg-[#D30CBD] blur-[500px] md:blur-[845px] w-[800px] h-[800px] -z-10 fixed -top-[700px] -right-[700px] md:-top-96 md:-right-96"></div>
-        <GreedyPigContext.Provider value={{ preloadSrcList }}>
+        <GreedyPigContext.Provider
+          value={{ preloadSrcList, setHasSound, hasSound, pigPetNames }}
+        >
           <Outlet />
         </GreedyPigContext.Provider>
       </main>

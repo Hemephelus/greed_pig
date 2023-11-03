@@ -6,10 +6,10 @@ import useAudio from "src/hooks/useAudio";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 
 export default function ImageSlider({ player, index }) {
+  const [slideIndex, setSlideIndex] = useState(player.pig_index);
   const { setPlayerData, playerData } = useLiveGameContext();
   const { preloadSrcList } = useGreedyPigContext();
-  let pigs = preloadSrcList.slice(0,9);
-  const [slideIndex, setSlideIndex] = useState(player.pig_index);
+  let pigs = preloadSrcList.filter(pig => pig.includes('pig'))
 
   const nextSlide = () => {
     let  newSlideIndex
@@ -59,8 +59,8 @@ export default function ImageSlider({ player, index }) {
         );
       })}
       <section className="flex gap-2 w-full">
-        <BtnSlider moveSlide={prevSlide} direction={"prev"} />
-        <BtnSlider moveSlide={nextSlide} direction={"next"} />
+        <BtnSlider moveSlide={prevSlide} direction={"prev"}/>
+        <BtnSlider moveSlide={nextSlide} direction={"next"}/>
       </section>
     </>
   );
@@ -71,7 +71,7 @@ function BtnSlider({ direction, moveSlide }) {
   return (
     <button
       className="w-[50%] p-2  flex justify-center bg-[#ffffff20] hover:bg-[#ffffff40] rounded border border-[#FFFFFF40] hover:border-[#ffffff80] active:scale-90 duration-[100ms] "
-      onClick={() => {audio.play(),moveSlide()}}
+      onClick={() => {audio?.play(),moveSlide()}}
 
     >
       {direction === "next" ? (

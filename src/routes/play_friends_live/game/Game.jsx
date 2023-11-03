@@ -26,8 +26,7 @@ export default function LiveGame() {
 
   const handlePassClick = () => {
     if (isRolling) return;
-    // If successful, update the isCopied state value
-    addPlayerAudio.play();
+    addPlayerAudio?.play();
     let cp = currentPlayer;
     let newPlayerData = [...playerData];
 

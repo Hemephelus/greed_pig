@@ -35,7 +35,7 @@ export function Dice({
 
       interval = setInterval(() => {
         if (endRoll < 30) {
-          diceRollAudio.play();
+          diceRollAudio?.play();
           r = Math.floor(Math.random() * 6);
           endRoll++;
           setCurrentDice(r);
@@ -45,7 +45,7 @@ export function Dice({
           let newPlayerData = [...playerData];
 
           if (r === 0) {
-            loseAudio.play();
+            loseAudio?.play();
             newPlayerData[cp]["running_points"] = r;
             cp = (currentPlayer + 1) % playerData.length;
             setCurrentPlayer(cp);
@@ -80,7 +80,7 @@ export function Dice({
       >
       {
         die.map((dice, index) => (
-          <img src={dice} alt={currentDice + 1} className={`${currentDice === index?'':'hidden'}`} />
+          <img key={index} src={dice} alt={currentDice + 1} className={`${currentDice === index?'':'hidden'}`} />
         ))
       }
         
@@ -110,7 +110,7 @@ function setGameOverPage(
       if (endRoll < 20) {
         endRoll++;
       } else {
-        celebrationAudio.play()
+        celebrationAudio?.play()
         setIsGameOver(true);
         clearInterval(interval);
       }

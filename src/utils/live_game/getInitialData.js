@@ -1,6 +1,6 @@
-import { generateId, getRandomIntegersBetween } from "../generateData";
+import { generateId } from "../generateData";
 
-export function getInitialPlayerData() {
+export function getInitialPlayerData(pigs, pigNames) {
   const MIN_PLAYERS = 2;
   const arr = [];
 
@@ -8,8 +8,8 @@ export function getInitialPlayerData() {
     const id = generateId();
     arr[i] = {
       id: id,
-      avatar: `/src/assets/pig-${i}.png`,
-      tag: `Player ${id.split('-')[1]}`,
+      avatar: pigs[i],
+      tag: pigNames[i],
       name: "",
       pig_index: i,
       running_points: 0,

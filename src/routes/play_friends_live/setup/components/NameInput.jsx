@@ -26,7 +26,7 @@ export default function NameInput({ player,index }) {
   }
 
   function removePlayer() {
-    audio.play()
+    audio?.play()
     let newPlayerData = [ ...playerData ];
     newPlayerData.splice(index,1)
     setPlayerData(newPlayerData);

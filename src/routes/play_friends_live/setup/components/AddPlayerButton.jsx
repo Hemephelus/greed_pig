@@ -7,23 +7,27 @@ import {
 import addPlayerSound from "src/sound_effect/add_player.mp3";
 import invalidSound from "src/sound_effect/invalid.mp3";
 import useAudio from "src/hooks/useAudio";
+import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 
 export default function AddPlayerButton() {
   const MAX_NUMBER_OF_PLAYERS = 8
   const { setPlayerData, playerData } = useLiveGameContext();
   const invalidAudio = useAudio(invalidSound);
   const addPlayerAudio = useAudio(addPlayerSound);
+  const { preloadSrcList, pigPetNames } = useGreedyPigContext();
+  const pigs = preloadSrcList.filter(pig => pig.includes('pig'))
 
+  
   function addPlayer() {
-    addPlayerAudio.play()
+    addPlayerAudio?.play()
     const newId = generateId();
     const index = playerData.length
 
     let newPlayerData = [...playerData];
     newPlayerData.push( {
       id: newId,
-      avatar: `/src/assets/pig-${index}.png`,
-      tag: `Player ${newId.split("-")[1]}`,
+      avatar: pigs[index],
+      tag: pigPetNames[index],
       name: "",
       pig_index: index,
       running_points: 0,
@@ -43,7 +47,7 @@ export default function AddPlayerButton() {
       {isMax() ? (
         <button
           className=" text-white flex flex-col p-2 gap-1 items-center justify-center bg-[#f93e3e20] hover:bg-[#f93e3e40] rounded border border-[#f93e3e40] hover:border-[#f93e3e80] active:-translate-x-3 duration-200 cursor-not-allowed"
-          onClick={() => {invalidAudio.play()}}
+          onClick={() => {invalidAudio?.play()}}
         >
           You have reach the max amount of players
         </button>

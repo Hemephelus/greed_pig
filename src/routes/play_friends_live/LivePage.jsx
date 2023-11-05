@@ -12,6 +12,7 @@ function LiveGamePage() {
   const [numberRolled, setNumberRolled] = useState(0);
   const [isRolling, setIsRolling] = useState(false); //if the state of the game was still in the running points
   const [isGameOver, setIsGameOver] = useState(false); 
+  const [isContinue, setIsContinue] = useState(false); 
   const [isRunning, setIsRunning] = useState("?"); //if the state of the game was still in the running points
   const [diceValue, setDiceValue] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState(0);
@@ -45,7 +46,9 @@ function LiveGamePage() {
             currentPlayer,
             setCurrentPlayer,
             setIsGameOver,
-            isGameOver
+            isGameOver,
+            isContinue,
+            setIsContinue
           }}
         >
           <Outlet />

@@ -29,19 +29,16 @@ const router = createBrowserRouter([
             path: "game/",
             element: <LiveGame />,
           },
-          // {
-          //   path: "game-over/",
-          //   element: < />,
-          // },
+          {
+            path: "how-to-play/",
+            element: <HowToPlay />,
+          },
         ]},
       {
         path: "/",
         element: <Home />,
       },
-      {
-        path: "how-to-play/",
-        element: <HowToPlay />,
-      },
+    
     ],
   },
 ]);

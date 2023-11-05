@@ -10,6 +10,26 @@ import pig5 from "src/assets/pig-5.png";
 import pig6 from "src/assets/pig-6.png";
 import pig7 from "src/assets/pig-7.png";
 import pig8 from "src/assets/pig-8.png";
+import pig9 from "src/assets/pig-9.png";
+import pig10 from "src/assets/pig-10.png";
+import pig11 from "src/assets/pig-11.png";
+import pig12 from "src/assets/pig-12.png";
+import pig13 from "src/assets/pig-13.png";
+import pig14 from "src/assets/pig-14.png";
+import pig15 from "src/assets/pig-15.png";
+import pig16 from "src/assets/pig-16.png";
+import pig17 from "src/assets/pig-17.png"
+import pig18 from "src/assets/pig-18.png"
+import pig19 from "src/assets/pig-19.png"
+import pig20 from "src/assets/pig-20.png"
+import pig21 from "src/assets/pig-21.png"
+import pig22 from "src/assets/pig-22.png"
+import pig23 from "src/assets/pig-23.png"
+import pig24 from "src/assets/pig-24.png"
+import pig25 from "src/assets/pig-25.png"
+import pig26 from "src/assets/pig-26.png"
+import pig27 from "src/assets/pig-27.png"
+import pig28 from "src/assets/pig-28.png"
 import dice1 from "src/assets/dice_1.png";
 import dice2 from "src/assets/dice_2.png";
 import dice3 from "src/assets/dice_3.png";
@@ -29,6 +49,26 @@ const preloadSrcList = [
   pig6,
   pig7,
   pig8,
+  pig9,
+  pig10,
+  pig11,
+  pig12,
+  pig13,
+  pig14,
+  pig15,
+  pig16,
+  pig17,
+  pig18,
+  pig19,
+  pig20,
+  pig22,
+  pig23,
+  pig24,
+  pig25,
+  pig26,
+  pig27,
+  pig28,
+  pig21,
   dice1,
   dice2,
   dice3,

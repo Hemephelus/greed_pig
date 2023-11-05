@@ -18,7 +18,7 @@ export function Dice({
 }) {
   const { preloadSrcList } = useGreedyPigContext();
   const [currentDice, setCurrentDice] = useState(0);
-  const die = preloadSrcList.slice(9);
+  const die = preloadSrcList.filter(dice => dice.includes('dice'))
   const diceRollAudio = useAudio(diceRollSound);
   const loseAudio = useAudio(loseSound);
   const celebrationAudio = useAudio(celebrationSound);
@@ -107,7 +107,7 @@ function setGameOverPage(
 
   if (currentPoint >= maxPoints) {
     interval = setInterval(() => {
-      if (endRoll < 20) {
+      if (endRoll < 10) {
         endRoll++;
       } else {
         celebrationAudio?.play()

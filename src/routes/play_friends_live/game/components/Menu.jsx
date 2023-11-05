@@ -1,6 +1,5 @@
 import React from "react";
 import { HiOutlineMenu } from "react-icons/hi";
-import { BiUndo, BiRedo } from "react-icons/bi";
 import { GoTools } from "react-icons/go";
 import { Link } from "react-router-dom";
 import SoundSwitch from "src/components/SoundSwitch";

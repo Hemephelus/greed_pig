@@ -17,30 +17,33 @@ function LiveGameSetup() {
     setDiceValue,
     setIsGameOver,
     setCurrentPlayer,
+    isContinue,
   } = useLiveGameContext();
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
-  const pigs = preloadSrcList.filter(pig => pig.includes('pig'))
+  const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
-  function setupPlayers() {
-    let newPlayerData = playerData.map((player) => {
-      let newPlayer = {
-        ...player,
-        running_points: 0,
-        total_points: 0,
-      };
-      return newPlayer;
-    });
+  function setupPlayers(resume) {
+    if (!resume) {
+      let newPlayerData = playerData.map((player) => {
+        let newPlayer = {
+          ...player,
+          running_points: 0,
+          total_points: 0,
+        };
+        return newPlayer;
+      });
 
-    setDiceValue(0);
-    setIsGameOver(false);
-    setCurrentPlayer(0);
-    setPlayerData(newPlayerData);
+      setDiceValue(0);
+      setIsGameOver(false);
+      setCurrentPlayer(0);
+      setPlayerData(newPlayerData);
+    }
     navigate("/live-game/game");
   }
 
   function clearsPlayers() {
-    setPlayerData(getInitialPlayerData(pigs,pigPetNames));
+    setPlayerData(getInitialPlayerData(pigs, pigPetNames));
   }
 
   return (
@@ -81,15 +84,32 @@ function LiveGameSetup() {
             >
               Clear Players
             </button>
-            <SoundSwitch/>
+            <SoundSwitch />
           </div>
-          <section>
-            <button
-              onClick={setupPlayers}
-              className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold duration-300 "
-            >
-              Start Game
-            </button>
+          <section className="flex gap-4 flex-wrap">
+            {isContinue ? (
+              <>
+                <button
+                  onClick={() => {setupPlayers(false)}}
+                  className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                >
+                  Start New Game
+                </button>
+                <button
+                  onClick={() => {setupPlayers(true)}}
+                  className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                >
+                  Resume Game
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {setupPlayers(false)}}
+                className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+              >
+                Start Game
+              </button>
+            )}
           </section>
         </div>
       </main>

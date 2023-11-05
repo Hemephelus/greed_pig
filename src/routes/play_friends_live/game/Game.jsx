@@ -1,70 +1,21 @@
-import React from "react";
-import { Dice } from "src/components/Dice";
+import React, { useEffect } from "react";
 import Navbar from "src/components/Navbar";
 import { useLiveGameContext } from "src/context/useLiveGameContext";
-import Menu from "./components/Menu";
-import addPlayerSound from "src/sound_effect/add_player.mp3";
-import useAudio from "src/hooks/useAudio";
 import PlayerTable from "./components/PlayerTable";
 import StatsSection from "./components/StatsSection";
 import GameOver from "./GameOver";
+import DiceSection from "./components/DiceSection";
 
 export default function LiveGame() {
-  const {
-    playerData,
-    setPlayerData,
-    setDiceValue,
-    isRolling,
-    setIsRolling,
-    currentPlayer,
-    setCurrentPlayer,
-    maxPoints,
-    setIsGameOver,
-    isGameOver,
-  } = useLiveGameContext();
-  const addPlayerAudio = useAudio(addPlayerSound);
+  const { playerData, currentPlayer, isGameOver, setIsContinue } = useLiveGameContext();
 
-  const handlePassClick = () => {
-    if (isRolling) return;
-    addPlayerAudio?.play();
-    let cp = currentPlayer;
-    let newPlayerData = [...playerData];
-
-    newPlayerData[cp]["total_points"] += newPlayerData[cp]["running_points"];
-    newPlayerData[cp]["running_points"] = 0;
-    setPlayerData(newPlayerData);
-
-    cp = (currentPlayer + 1) % playerData.length;
-    setCurrentPlayer(cp);
-  };
-
+  useEffect(() => {
+    setIsContinue(true)
+  }, [])
+  
   return (
-    <div className="grid grid-cols-[auto_1fr_minmax(auto,_300px)]">
-      <div className="h-screen border-r-[#ffffff40] border-r flex flex-col items-center justify-around p-8 sticky top-0 bg-[#00000010] ">
-        <Dice
-          getFinalDiceValue={setDiceValue}
-          setIsRolling={setIsRolling}
-          isRolling={isRolling}
-          setCurrentPlayer={setCurrentPlayer}
-          currentPlayer={currentPlayer}
-          playerData={playerData}
-          setPlayerData={setPlayerData}
-          maxPoints={maxPoints}
-          setIsGameOver={setIsGameOver}
-        />
-        <a
-          href={"#" + (currentPlayer % playerData.length)}
-          className="bg-[#056FA4c0] w-full  text-white text-center text-2xl font-semibold py-4 rounded-lg border hover:scale-105 active:scale-100 duration-300"
-          onClick={handlePassClick}
-        >
-          PASS
-        </a>
-        <div className="text-white grid place-content-center gap-2 bg-[#ffffff10] w-full p-4 rounded-lg border border-[#ffffff40]">
-          <p className="text-center text-lg">{playerData.length} players</p>
-          <p className="text-center text-lg">{maxPoints} max points</p>
-        </div>
-        <Menu />
-      </div>
+    <div className="md:grid md:grid-cols-[minmax(auto,_200px)_1fr_minmax(auto,_200px)] lg:grid-cols-[minmax(auto,_250px)_1fr_minmax(auto,_250px)] xl:grid-cols-[auto_1fr_minmax(auto,_300px)]">
+      <DiceSection />
       <div className=" space-y-2 p-2">
         <Navbar />
         <PlayerTable playerData={playerData} currentPlayer={currentPlayer} />
@@ -72,7 +23,7 @@ export default function LiveGame() {
 
       <StatsSection playerData={playerData} currentPlayer={currentPlayer} />
       {isGameOver ? (
-        <GameOver playerData={playerData} currentPlayer={currentPlayer} />
+        <GameOver playerData={playerData} currentPlayer={currentPlayer} setIsContinue={setIsContinue} />
       ) : (
         <></>
       )}

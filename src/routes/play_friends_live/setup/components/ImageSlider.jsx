@@ -51,7 +51,7 @@ export default function ImageSlider({ player, index }) {
             key={index}
             className={`${
               slideIndex === index ? " opacity-100" : "opacity-0 hidden "
-            } w-full duration-500 h-[160px] flex justify-center items-center`}
+            } w-[120px] duration-500 h-[160px] flex justify-center items-center`}
           >
            
             <img src={pig} />

@@ -1,71 +1,39 @@
 import { useEffect, useState } from "react";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import diceRollSound from "src/sound_effect/dice_roll.mp3";
-import loseSound from "src/sound_effect/lose_sound.mp3";
-import celebrationSound from "src/sound_effect/celebration.mp3";
 import useAudio from "src/hooks/useAudio";
 
 export function Dice({
   getFinalDiceValue,
   setIsRolling,
   isRolling,
-  currentPlayer,
-  setCurrentPlayer,
-  playerData,
-  setPlayerData,
-  maxPoints,
-  setIsGameOver,
+  setChangeBackground,
 }) {
   const { preloadSrcList } = useGreedyPigContext();
   const [currentDice, setCurrentDice] = useState(0);
-  const die = preloadSrcList.filter(dice => dice.includes('dice'))
+  const die = preloadSrcList.filter((dice) => dice.includes("dice"));
   const diceRollAudio = useAudio(diceRollSound);
-  const loseAudio = useAudio(loseSound);
-  const celebrationAudio = useAudio(celebrationSound);
 
   const handleDiceClick = () => {
-    // If successful, update the isCopied state value
     setIsRolling(true);
+    setChangeBackground(true);
   };
 
   useEffect(() => {
     if (isRolling) {
       let endRoll = 0;
-      let interval, r;
-
+      let interval, diceValue;
       interval = setInterval(() => {
         if (endRoll < 30) {
           diceRollAudio?.play();
-          r = Math.floor(Math.random() * 6);
+          diceValue = Math.floor(Math.random() * 6);
+          setCurrentDice(diceValue);
           endRoll++;
-          setCurrentDice(r);
         } else {
-          
-          let cp = currentPlayer;
-          let newPlayerData = [...playerData];
-
-          if (r === 0) {
-            loseAudio?.play();
-            newPlayerData[cp]["running_points"] = r;
-            cp = (currentPlayer + 1) % playerData.length;
-            setCurrentPlayer(cp);
-          } else {
-            setGameOverPage(
-              r,
-              playerData,
-              currentPlayer,
-              maxPoints,
-              setIsGameOver,
-              celebrationAudio
-            );
-            newPlayerData[cp]["running_points"] += r + 1;
-            setPlayerData(newPlayerData);
-  
-          }
-
           clearInterval(interval);
-          getFinalDiceValue(r + 1);
+          getFinalDiceValue(diceValue + 1);
           setIsRolling(false);
+          setChangeBackground(false);
         }
       }, 100);
     }
@@ -74,46 +42,19 @@ export function Dice({
   return (
     <>
       <button
-        className={`hover:scale-105 active:scale-100 duration-300`}
+        className={`hover:scale-105 active:scale-100 duration-300 md:w-auto w-[200px]`}
         onClick={handleDiceClick}
         disabled={isRolling}
       >
-      {
-        die.map((dice, index) => (
-          <img key={index} src={dice} alt={currentDice + 1} className={`${currentDice === index?'':'hidden'}`} />
-        ))
-      }
-        
+        {die.map((dice, index) => (
+          <img
+            key={index}
+            src={dice}
+            alt={currentDice + 1}
+            className={`${currentDice === index ? "" : "hidden"}`}
+          />
+        ))}
       </button>
     </>
   );
-}
-
-function setGameOverPage(
-  r,
-  playerData,
-  currentPlayer,
-  maxPoints,
-  setIsGameOver,
-  celebrationAudio
-) {
-  let currentPoint =
-    playerData[currentPlayer].running_points +
-    playerData[currentPlayer].total_points +
-    r +
-    1;
-  let interval
-  let endRoll = 0
-
-  if (currentPoint >= maxPoints) {
-    interval = setInterval(() => {
-      if (endRoll < 10) {
-        endRoll++;
-      } else {
-        celebrationAudio?.play()
-        setIsGameOver(true);
-        clearInterval(interval);
-      }
-    }, 100);
-  }
 }

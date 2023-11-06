@@ -20,7 +20,7 @@ function GameOver({ playerData, currentPlayer, setIsContinue }) {
     setLeaderBoard(newLeaderBoard);
   }, [playerData, currentPlayer]);
   return (
-    <div className=" h-screen w-screen absolute bg-[#00000080] flex justify-center items-center  text-white">
+    <div className=" min-h-screen w-screen absolute bg-[#000000c0] flex justify-center items-center  text-white top-0">
       <Confetti width={windowWidth.current} height={windowHeight.current} />
       <section className="grid place-content-center gap-4 w-[400px]">
         <figure className="flex justify-center w-full">

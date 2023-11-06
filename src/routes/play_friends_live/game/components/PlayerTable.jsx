@@ -2,7 +2,7 @@ import React from 'react'
 
 function PlayerTable({playerData, currentPlayer}) {
   return (
-    <table className="w-full">
+    <table className="hidden md:table w-full">
           <thead>
             <tr className=" w-full h-[50px] bg-[#ffffff20] text-sm lg:text-base items-center  p-2 rounded-lg border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300">
               <th className=" text-center text-white">Icons</th>

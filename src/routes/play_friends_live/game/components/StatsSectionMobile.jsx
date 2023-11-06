@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function StatsSection({ playerData, currentPlayer }) {
+function StatsSectionMobile({ playerData, currentPlayer }) {
   const [leaderBoard, setLeaderBoard] = useState(playerData);
   useEffect(() => {
     let newLeaderBoard = [...playerData].sort(
@@ -10,16 +10,8 @@ function StatsSection({ playerData, currentPlayer }) {
   }, [playerData,currentPlayer]);
 
   return (
-    <section className="hidden h-screen border-l-[#ffffff40] border-l sticky top-0 md:grid grid-rows-[auto_auto_1fr] bg-[#00000010] text-[#F9F7E8] overflow-auto">
-      <div className=" h-[250px] flex flex-col items-center justify-center gap-2 text-sm lg:text-base">
-        <figure
-          className={` w-[150px] h-[150px] flex justify-center items-center bg-[#ffffff20] p-2 rounded-lg border border-[#FFFFFF40] hover:border-[#ffffff80] duration-300`}
-        >
-          <img src={playerData[currentPlayer].avatar} />
-        </figure>
-        {playerData[currentPlayer].name === ''?playerData[currentPlayer].tag:playerData[currentPlayer].name}'s Turn
-  </div>      
-      <div className="bg-[#ffffff10]  text-lg lg:text-xl xl:text-2xl font-extrabold border-y border-[#ffffff80] py-2 lg:py-4 text-center ">
+    <section className="border-l-[#ffffff40] border-l sticky top-0 md:hidden grid grid-rows-[auto_auto_1fr] bg-[#00000010] text-[#F9F7E8] overflow-auto">
+      <div className="bg-[#ffffff10] md:text-lg lg:text-xl xl:text-2xl font-extrabold border-y border-[#ffffff80] py-2 lg:py-4 text-center ">
         Leader Board
       </div>
       <div className=" overflow-y-auto p-2 bg-[#00000010]">
@@ -48,6 +40,9 @@ function StatsSection({ playerData, currentPlayer }) {
                 <td className="  ">
                   {player.total_points + player.running_points}
                 </td>
+                <td className="  ">
+                  { player.running_points}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -57,4 +52,4 @@ function StatsSection({ playerData, currentPlayer }) {
   );
 }
 
-export default StatsSection;
+export default StatsSectionMobile;

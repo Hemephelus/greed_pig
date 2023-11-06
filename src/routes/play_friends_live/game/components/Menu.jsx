@@ -6,8 +6,8 @@ import SoundSwitch from "src/components/SoundSwitch";
 
 function Menu() {
   return (
-    <div className="group flex flex-col items-center gap-2 hover:cursor-pointer text-sm">
-      <div className="flex  gap-2 group-hover:scale-100 scale-0 delay-300 duration-500 bg-[#D30CBD40] p-2 rounded-lg">
+    <div className="group flex flex-col items-center gap-2 hover:cursor-pointer text-sm relative">
+      <div className="flex  gap-2 group-hover:scale-100 scale-0 delay-300 duration-500 bg-[#D30CBD] bottom-0 md:bg-[#D30CBD40] p-2 rounded-lg absolute w-[150px] m-auto">
         {/* <div className="grid grid-cols-2 gap-2">
           <button
             className=" bg-[#ffffff20] hover:bg-[#ffffff40] text-white rounded-lg flex flex-col gap-2 p-2  justify-center items-center hover:scale-105 active:scale-100 duration-300"
@@ -24,10 +24,10 @@ function Menu() {
             <BiRedo size={24} /> Redo
           </button>
         </div> */}
-        <div  className="grid grid-cols-2 gap-2">
+        <div  className="grid grid-cols-2 gap-2 w-full">
           <Link
             to={`/live-game/setup`}
-            className=" bg-[#ffffff20] hover:bg-[#ffffff40] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
+            className=" bg-[#ffffff40] hover:bg-[#ffffff80] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
             title="Setup"
           >
             {" "}
@@ -35,7 +35,7 @@ function Menu() {
             Setup
           </Link>
           <div
-            className=" bg-[#ffffff20] hover:bg-[#ffffff40] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
+            className=" bg-[#ffffff40] hover:bg-[#ffffff80] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
             title="Setup"
           >
            <SoundSwitch/> Sound

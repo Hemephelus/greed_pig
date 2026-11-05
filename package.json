@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth/core": "^0.41.1",
+    "@convex-dev/auth": "^0.0.96",
     "@supabase/supabase-js": "^2.38.4",
     "convex": "^1.49.0",
     "localforage": "^1.10.0",

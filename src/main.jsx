@@ -1,14 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ConvexReactClient } from "convex/react";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import "./index.css";
 import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import LiveGameSetup from "./routes/play_friends_live/setup/Setup";
 import Home from "./routes/Home";
+import SignIn from "./routes/SignIn";
 import HowToPlay from "./routes/HowToPlay";
 import LiveGame from "./routes/play_friends_live/game/Game";
 import LiveGamePage from "./routes/play_friends_live/LivePage";
+
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
 const router = createBrowserRouter([
   {
@@ -33,19 +38,24 @@ const router = createBrowserRouter([
             path: "how-to-play/",
             element: <HowToPlay />,
           },
-        ]
+        ],
+      },
+      {
+        path: "sign-in/",
+        element: <SignIn />,
       },
       {
         path: "/",
         element: <Home />,
       },
-
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ConvexAuthProvider client={convex}>
+      <RouterProvider router={router} />
+    </ConvexAuthProvider>
   </React.StrictMode>
 );

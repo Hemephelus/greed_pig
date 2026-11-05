@@ -33,12 +33,13 @@ const router = createBrowserRouter([
             path: "how-to-play/",
             element: <HowToPlay />,
           },
-        ]},
+        ]
+      },
       {
         path: "/",
         element: <Home />,
       },
-    
+
     ],
   },
 ]);

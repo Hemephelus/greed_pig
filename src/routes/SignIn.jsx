@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function SignIn() {
     const { signIn, signOut } = useAuthActions();
+    const navigate = useNavigate();
     const { isAuthenticated, isLoading } = useConvexAuth();
     const me = useQuery(api.users.me);
     const [flow, setFlow] = useState("signIn"); // "signIn" or "signUp"
@@ -19,6 +21,7 @@ export default function SignIn() {
         formData.set("flow", flow);
         try {
             await signIn("password", formData);
+            navigate("/");
         } catch {
             setError(
                 flow === "signIn"
@@ -46,10 +49,15 @@ export default function SignIn() {
                     <p>
                         Signed in as <b>{me?.name ?? me?.email ?? "..."}</b>
                     </p>
-                    <button
-                        onClick={() => signOut()}
-                        className="bg-[#056FA4c0] px-6 py-2 rounded-lg border"
-                    >
+                    <div className="flex gap-3">
+                        <Link to="/" className="bg-[#d30cbcc0] px-6 py-2 rounded-lg font-bold">
+                            Home
+                        </Link>
+                        <Link to="/engine-test" className="bg-[#056FA4c0] px-6 py-2 rounded-lg border">
+                            Engine test
+                        </Link>
+                    </div>
+                    <button onClick={() => signOut()} className="underline text-sm">
                         Sign out
                     </button>
                 </>

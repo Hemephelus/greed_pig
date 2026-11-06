@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import PowerUpTray from "src/components/PowerUpTray";
+import PlayerBadges from "../components/PlayerBadges";
+import DirectionArrow from "../components/DirectionArrow";
+import Toast from "../components/Toast";
+import { describeRoll } from "../utils/describeRoll";
 
 export default function EngineTest() {
     const [code, setCode] = useState("");
@@ -15,6 +20,10 @@ export default function EngineTest() {
     const pass = useMutation(api.game.pass);
     const activate = useMutation(api.game.activatePowerUp);
     const devGrant = useMutation(api.game.devGrant);
+    const meUser = useQuery(api.users.me);
+    const myPlayer = room?.players.find((p) => p.userId === meUser?._id);
+    const myTurn = room?.status === "playing" && myPlayer?.seat === room?.currentSeat;
+    const [toast, setToast] = useState("");
 
     async function run(fn) {
         setMessage("");
@@ -46,7 +55,7 @@ export default function EngineTest() {
             {code && (
                 <div className="flex gap-2 flex-wrap">
                     <button className={btn} onClick={() => run(() => startGame({ code }))}>Start game (host)</button>
-                    <button className={btn} onClick={() => run(() => roll({ code }))}>Roll</button>
+                    <button className={btn} onClick={() => run(async () => { const r = await roll({ code }); setToast(describeRoll(r)); return r; })}>Roll</button>
                     <button className={btn} onClick={() => run(() => pass({ code }))}>Pass</button>
                 </div>
             )}
@@ -65,6 +74,27 @@ export default function EngineTest() {
                     ))}
                 </div>
             )}
+
+            {myPlayer && (
+                <PowerUpTray
+                    powerUps={myPlayer.powerUps}
+                    disabled={!myTurn}
+                    onUse={(id) => run(() => activate({ code, powerUp: id }))}
+                />
+            )}
+
+            {room && (
+                <div className="space-y-2">
+                    <DirectionArrow direction={room.direction ?? 1} />
+                    {room.players.map((p) => (
+                        <div key={p._id} className="flex items-center gap-2">
+                            <span>{p.name}</span>
+                            <PlayerBadges player={p} />
+                        </div>
+                    ))}
+                </div>
+            )}
+            <Toast message={toast} onDone={() => setToast("")} />
 
             {message && <p className="text-yellow-300">Result: {message}</p>}
             <pre className="bg-[#ffffff10] p-3 rounded-md overflow-auto text-sm">

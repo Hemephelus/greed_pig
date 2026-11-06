@@ -20,6 +20,7 @@ export default defineSchema({
         lastRoll: v.optional(v.number()),
         winnerId: v.optional(v.id("users")),
         finishedAt: v.optional(v.number()),
+        direction: v.optional(v.number()), // 1 = normal, -1 = reversed
     }).index("by_code", ["code"]),
 
     // One document per player in a room
@@ -31,6 +32,9 @@ export default defineSchema({
         totalPoints: v.number(),
         runningPoints: v.number(),
         powerUps: v.array(v.string()), // filled in by the power-ups lane
+        shieldArmed: v.optional(v.boolean()),
+        doubleArmed: v.optional(v.boolean()),
+        frozen: v.optional(v.boolean()),
     })
         .index("by_room", ["roomId"])
         .index("by_user", ["userId"])
@@ -49,5 +53,6 @@ export default defineSchema({
         value: v.optional(v.number()),
         runningAfter: v.number(),
         totalAfter: v.number(),
+        detail: v.optional(v.string()),
     }).index("by_room", ["roomId"]),
 });

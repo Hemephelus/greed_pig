@@ -13,6 +13,8 @@ export default function EngineTest() {
     const startGame = useMutation(api.rooms.startGame);
     const roll = useMutation(api.game.roll);
     const pass = useMutation(api.game.pass);
+    const activate = useMutation(api.game.activatePowerUp);
+    const devGrant = useMutation(api.game.devGrant);
 
     async function run(fn) {
         setMessage("");
@@ -46,6 +48,21 @@ export default function EngineTest() {
                     <button className={btn} onClick={() => run(() => startGame({ code }))}>Start game (host)</button>
                     <button className={btn} onClick={() => run(() => roll({ code }))}>Roll</button>
                     <button className={btn} onClick={() => run(() => pass({ code }))}>Pass</button>
+                </div>
+            )}
+
+            {code && (
+                <div className="flex gap-3 flex-wrap">
+                    {["shield", "double", "freeze", "reverse"].map((p) => (
+                        <span key={p} className="flex gap-1">
+                            <button className={btn} onClick={() => run(() => devGrant({ code, powerUp: p }))}>
+                                + {p} (dev)
+                            </button>
+                            <button className={btn} onClick={() => run(() => activate({ code, powerUp: p }))}>
+                                Use {p}
+                            </button>
+                        </span>
+                    ))}
                 </div>
             )}
 

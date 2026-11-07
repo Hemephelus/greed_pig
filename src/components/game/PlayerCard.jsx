@@ -10,35 +10,32 @@ export default function PlayerCard({ player, isActive }) {
   return (
     <li
       aria-current={isActive ? "true" : undefined}
-      className={`rounded-xl border-2 p-3 ${
-        isActive ? "border-yellow-400 bg-yellow-50" : "border-gray-300 bg-white"
+      className={`list-none rounded-lg border p-3 text-white duration-300 ${
+        isActive
+          ? "bg-[#ffffff40] border-[#FFFF8F] hover:border-[#FFFF8F]"
+          : "bg-[#ffffff10] border-[#FFFFFF40] hover:border-[#ffffff80]"
       }`}
     >
       <div className="flex items-center justify-between gap-2">
-        <h3 className="font-bold">{player.name}</h3>
-        <span
-          className="text-xs"
-          aria-label={`${powerupCount} power-ups held`}
-        >
+        <h3 className="text-base font-bold lg:text-xl">{player.name}</h3>
+        <span className="text-xs" aria-label={`${powerupCount} power-ups held`}>
           ⚡ {powerupCount}
         </span>
       </div>
 
       <p className="text-2xl font-bold">{player.total_score}</p>
 
-      {isActive && (
-        <p className="text-sm">Turn score: {player.turn_score}</p>
-      )}
+      {isActive && <p className="text-sm">Turn score: {player.turn_score}</p>}
 
       <div className="mt-2 flex flex-wrap gap-1">
         {player.shield_active && (
-          <Chip className="bg-blue-100 text-blue-800">Shield ready</Chip>
+          <Chip className="bg-[#3b82f650] text-blue-100">Shield ready</Chip>
         )}
         {player.double_active && (
-          <Chip className="bg-purple-100 text-purple-800">x2</Chip>
+          <Chip className="bg-[#a00f9660] text-purple-100">x2</Chip>
         )}
         {player.skip_next_turn && (
-          <Chip className="bg-cyan-100 text-cyan-800">Skips next turn</Chip>
+          <Chip className="bg-[#22d3ee40] text-cyan-100">Skips next turn</Chip>
         )}
       </div>
     </li>

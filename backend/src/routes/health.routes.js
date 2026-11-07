@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { supabase } from "../src/config/supabase.js.js";
-import { ApiError, asyncHandler } from "../src/utils/ApiError.js.js"
+import { supabase } from "../config/supabase.js";
+import { ApiError, asyncHandler } from "../utils/ApiError.js"
 
 const router = Router();
 

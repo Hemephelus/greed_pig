@@ -4,7 +4,9 @@ import diceRollSound from "src/sound_effect/dice_roll.mp3";
 import useAudio from "src/hooks/useAudio";
 
 export function Dice({
+  requestRoll,
   getFinalDiceValue,
+  onError,
   setIsRolling,
   isRolling,
   setChangeBackground,
@@ -20,23 +22,37 @@ export function Dice({
   };
 
   useEffect(() => {
-    if (isRolling) {
-      let endRoll = 0;
-      let interval, diceValue;
-      interval = setInterval(() => {
-        if (endRoll < 30) {
-          diceRollAudio?.play();
-          diceValue = Math.floor(Math.random() * 6);
-          setCurrentDice(diceValue);
-          endRoll++;
-        } else {
-          clearInterval(interval);
-          getFinalDiceValue(diceValue + 1);
-          setIsRolling(false);
-          setChangeBackground(false);
-        }
-      }, 100);
-    }
+    if (!isRolling) return;
+
+    let ticks = 0;
+    // Ask the server for the real roll straight away. The spinning faces below
+    // are only for show; the number that counts is the one the server returns.
+    const serverRoll = requestRoll().then(
+      (result) => ({ result }),
+      (error) => ({ error })
+    );
+
+    const interval = setInterval(async () => {
+      if (ticks < 30) {
+        diceRollAudio?.play();
+        setCurrentDice(Math.floor(Math.random() * 6));
+        ticks++;
+        return;
+      }
+
+      clearInterval(interval);
+      const { result, error } = await serverRoll;
+      if (error) {
+        onError(error.message);
+      } else {
+        setCurrentDice(result.roll - 1);
+        getFinalDiceValue(result);
+      }
+      setIsRolling(false);
+      setChangeBackground(false);
+    }, 100);
+
+    return () => clearInterval(interval);
   }, [isRolling]);
 
   return (

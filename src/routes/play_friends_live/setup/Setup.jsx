@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSwitch from "src/components/SoundSwitch";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
+import ErrorBanner from "src/components/ErrorBanner";
+import { createGame, getGame } from "src/utils/api";
 
 function LiveGameSetup() {
   const {
@@ -18,28 +20,51 @@ function LiveGameSetup() {
     setIsGameOver,
     setCurrentPlayer,
     isContinue,
+    gameId,
+    setGameId,
+    setApiError,
   } = useLiveGameContext();
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
-  function setupPlayers(resume) {
-    if (!resume) {
-      let newPlayerData = playerData.map((player) => {
-        let newPlayer = {
-          ...player,
-          running_points: 0,
-          total_points: 0,
-        };
-        return newPlayer;
-      });
+  async function setupPlayers(resume) {
+    setApiError("");
+    try {
+      // "Resume" only works if the saved game still exists on the server,
+      // is not finished, and has the same number of players.
+      let canResume = false;
+      if (resume && gameId) {
+        try {
+          const saved = await getGame(gameId);
+          canResume = !saved.isGameOver && saved.players.length === playerData.length;
+        } catch {
+          canResume = false;
+        }
+      }
 
-      setDiceValue(0);
-      setIsGameOver(false);
-      setCurrentPlayer(0);
-      setPlayerData(newPlayerData);
+      if (!canResume) {
+        const game = await createGame(playerData, maxPoints);
+        setGameId(game.id);
+
+        let newPlayerData = playerData.map((player) => {
+          let newPlayer = {
+            ...player,
+            running_points: 0,
+            total_points: 0,
+          };
+          return newPlayer;
+        });
+
+        setDiceValue(0);
+        setIsGameOver(false);
+        setCurrentPlayer(0);
+        setPlayerData(newPlayerData);
+      }
+      navigate("/live-game/game");
+    } catch (e) {
+      setApiError(e.message);
     }
-    navigate("/live-game/game");
   }
 
   function clearsPlayers() {
@@ -49,6 +74,7 @@ function LiveGameSetup() {
   return (
     <>
       <main className="">
+        <ErrorBanner />
         <Navbar />
         <div className="flex flex-col items-center gap-8 text-white px-[5%] md:px-[10%] py-4 ">
           <section className="flex flex-col">

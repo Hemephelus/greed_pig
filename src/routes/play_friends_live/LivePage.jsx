@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { LiveGameContext } from "src/context/useLiveGameContext";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
+import { GameSessionProvider } from "src/context/GameSessionContext";
 
 function LiveGamePage() {
   const { preloadSrcList,pigPetNames } = useGreedyPigContext();
@@ -52,7 +53,9 @@ function LiveGamePage() {
             setIsContinue
           }}
         >
-          <Outlet />
+          <GameSessionProvider>
+            <Outlet />
+          </GameSessionProvider>
         </LiveGameContext.Provider>
       </main>
     </>

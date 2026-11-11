@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import Navbar from "src/components/Navbar";
+import ErrorBanner from "src/components/ErrorBanner";
 import { useLiveGameContext } from "src/context/useLiveGameContext";
 import PlayerTable from "./components/PlayerTable";
 import StatsSection from "./components/StatsSection";
@@ -21,6 +22,7 @@ export default function LiveGame() {
       <DiceSection />
       <div className=" space-y-2 p-2">
         <Navbar />
+        <ErrorBanner />
         <PlayerTable playerData={playerData} currentPlayer={currentPlayer} />
       </div>
       <CurrentPlayerMobile playerData={playerData} currentPlayer={currentPlayer}/>

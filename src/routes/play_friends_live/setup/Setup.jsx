@@ -8,6 +8,7 @@ import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSwitch from "src/components/SoundSwitch";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { useGameSession } from "src/context/GameSessionContext";
+import ErrorBanner from "src/components/ErrorBanner";
 import { MAX_TARGET, MIN_TARGET } from "src/constants/game";
 
 function LiveGameSetup() {
@@ -19,7 +20,7 @@ function LiveGameSetup() {
     setDiceValue,
     isContinue,
   } = useLiveGameContext();
-  const { startGame, isBusy, error, clearError } = useGameSession();
+  const { startGame, isBusy, clearError } = useGameSession();
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
@@ -52,6 +53,7 @@ function LiveGameSetup() {
       <main className="">
         <Navbar />
         <div className="flex flex-col items-center gap-8 text-white px-[5%] md:px-[10%] py-4 ">
+          <ErrorBanner />
           <section className="flex flex-col">
             <label htmlFor="">Max Score</label>
             <input
@@ -88,14 +90,6 @@ function LiveGameSetup() {
             </button>
             <SoundSwitch />
           </div>
-          {error ? (
-            <p
-              role="alert"
-              className="text-center px-4 py-2 rounded border border-[#D30C0C80] bg-[#D30C0C40] max-w-prose"
-            >
-              {error.message}
-            </p>
-          ) : null}
           <section className="flex gap-4 flex-wrap justify-center">
             {isContinue ? (
               <>

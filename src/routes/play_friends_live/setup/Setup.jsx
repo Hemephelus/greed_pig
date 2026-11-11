@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSwitch from "src/components/SoundSwitch";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
+import { useGameSession } from "src/context/GameSessionContext";
+import { MAX_TARGET, MIN_TARGET } from "src/constants/game";
 
 function LiveGameSetup() {
   const {
@@ -15,31 +17,30 @@ function LiveGameSetup() {
     setMaxPoints,
     setPlayerData,
     setDiceValue,
-    setIsGameOver,
-    setCurrentPlayer,
     isContinue,
   } = useLiveGameContext();
+  const { startGame, isBusy, error, clearError } = useGameSession();
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
-  function setupPlayers(resume) {
-    if (!resume) {
-      let newPlayerData = playerData.map((player) => {
-        let newPlayer = {
-          ...player,
-          running_points: 0,
-          total_points: 0,
-        };
-        return newPlayer;
-      });
-
-      setDiceValue(0);
-      setIsGameOver(false);
-      setCurrentPlayer(0);
-      setPlayerData(newPlayerData);
+  async function setupPlayers(resume) {
+    if (resume) {
+      navigate("/live-game/game");
+      return;
     }
-    navigate("/live-game/game");
+
+    clearError();
+    setDiceValue(0); // reset the background glow from a previous bust
+
+    // The server creates the game, checks the rules and owns the scores.
+    // startGame returns the new game_id, or null if it failed (error is set).
+    const gameId = await startGame({
+      setupPlayers: playerData,
+      winningTarget: maxPoints,
+    });
+
+    if (gameId) navigate(`/live-game/game/${gameId}`);
   }
 
   function clearsPlayers() {
@@ -55,7 +56,8 @@ function LiveGameSetup() {
             <label htmlFor="">Max Score</label>
             <input
               type="number"
-              min={25}
+              min={MIN_TARGET}
+              max={MAX_TARGET}
               value={maxPoints}
               onChange={(e) => {
                 setMaxPoints(e.target.value);
@@ -86,14 +88,23 @@ function LiveGameSetup() {
             </button>
             <SoundSwitch />
           </div>
+          {error ? (
+            <p
+              role="alert"
+              className="text-center px-4 py-2 rounded border border-[#D30C0C80] bg-[#D30C0C40] max-w-prose"
+            >
+              {error.message}
+            </p>
+          ) : null}
           <section className="flex gap-4 flex-wrap justify-center">
             {isContinue ? (
               <>
                 <button
                   onClick={() => {setupPlayers(false)}}
-                  className="w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                  disabled={isBusy}
+                  className="w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 "
                 >
-                  Start New Game
+                  {isBusy ? "Creating game…" : "Start New Game"}
                 </button>
                 <button
                   onClick={() => {setupPlayers(true)}}
@@ -105,9 +116,10 @@ function LiveGameSetup() {
             ) : (
               <button
                 onClick={() => {setupPlayers(false)}}
-                className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                disabled={isBusy}
+                className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 "
               >
-                Start Game
+                {isBusy ? "Creating game…" : "Start Game"}
               </button>
             )}
           </section>

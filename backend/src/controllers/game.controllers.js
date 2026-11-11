@@ -64,3 +64,85 @@ export async function createGame(req, res) {
     players: playerRows.map((row) => formatPlayer(row)),
   });
 }
+
+export async function getGame(req, res) {
+  const { session, players, powerups } = await loadRoom(req.params.game_id);
+
+  res.json({
+    success: true,
+    session: {
+      id: session.id,
+      status: session.status,
+      winning_target: session.winning_target,
+      active_player_index: session.active_player_index,
+    },
+    players: players.map((row) => formatPlayer(row, powerups)),
+  });
+}
+
+
+async function loadRoom(gameId) {
+  const { data: session, error: sessionError } = await supabase
+    .from("game_sessions")
+    .select("*")
+    .eq("id", gameId)
+    .maybeSingle();
+
+  if (sessionError) throw sessionError;
+
+  if (!session) {
+    throw new ApiError(404, "GAME_NOT_FOUND", `Game ${gameId} was not found.`);
+  }
+
+  const { data: players, error: playersError } = await supabase
+    .from("players")
+    .select("*")
+    .eq("game_id", gameId)
+    .order("player_index", { ascending: true });
+
+  if (playersError) throw playersError;
+
+  let powerups = [];
+
+  if (players.length > 0) {
+    const { data, error } = await supabase
+      .from("player_powerups")
+      .select("*")
+      .in("player_id", players.map((p) => p.id))
+      .eq("status", "AVAILABLE");
+
+    if (error) throw error;
+    powerups = data;
+  }
+
+  return { session, players, powerups };
+}
+
+// Checks if a Player can play
+function assertCanPlay(session, playerIndex) {
+
+  if (session.status === WON) throw new ApiError(409, "GAME_OVER", `Game ${session.id} has concluded`)
+
+  if (session.active_player_index !== playerIndex) throw new ApiError(409, "NOT_YOUR_TURN", `It's not ${playerIndex + 1}'s turn yet`)
+
+}
+
+// Get next player index
+function nextPlayerIndex(session, players) {
+  return (session.active_player_index + 1) % players.length;
+}
+
+// validate the current turn
+function validateTurnBody(body) {
+  const { game_id, player_index } = body || {};
+
+  if (typeof game_id !== "string" || game_id.trim() === "" || game_id.length > 50) {
+    throw new ApiError(400, "INVALID_INPUT", "game_id must be a game code like room_a1b2c3d4.");
+  }
+
+  if (!Number.isInteger(player_index) || player_index < 0) {
+    throw new ApiError(400, "INVALID_INPUT", "player_index must be a whole number, 0 or more.");
+  }
+
+  return { game_id, player_index };
+}

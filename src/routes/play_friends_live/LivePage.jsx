@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { LiveGameContext } from "src/context/useLiveGameContext";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
+import { generateId } from "src/utils/generateData";
+import { addRollToGameLog, closeGameLogTurn, createGameLog, finishGameLog as finishLog } from "src/utils/live_game/gameLog";
 
 function LiveGamePage() {
   const { preloadSrcList,pigPetNames } = useGreedyPigContext();
@@ -16,6 +18,27 @@ function LiveGamePage() {
   const [isRunning, setIsRunning] = useState("?"); //if the state of the game was still in the running points
   const [diceValue, setDiceValue] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState(0);
+  const gameLogRef = useRef(null);
+
+  function startGameLog({ mode = "classic", targetScore, players }) {
+    gameLogRef.current = createGameLog({ clientGameId: generateId(), mode, targetScore: Number(targetScore), players });
+  }
+
+  function logRoll(seat, dice, busted) {
+    gameLogRef.current = addRollToGameLog(gameLogRef.current, seat, dice, busted);
+  }
+
+  function logPass(seat, pointsBanked) {
+    gameLogRef.current = closeGameLogTurn(gameLogRef.current, seat, "banked", pointsBanked);
+  }
+
+  function finishGameLog(winnerSeat, winnerRunningPoints) {
+    gameLogRef.current = finishLog(gameLogRef.current, winnerSeat, winnerRunningPoints);
+  }
+
+  function getGameLog() {
+    return gameLogRef.current;
+  }
   
   return (
     <>
@@ -49,7 +72,12 @@ function LiveGamePage() {
             setIsGameOver,
             isGameOver,
             isContinue,
-            setIsContinue
+            setIsContinue,
+            startGameLog,
+            logRoll,
+            logPass,
+            finishGameLog,
+            getGameLog
           }}
         >
           <Outlet />

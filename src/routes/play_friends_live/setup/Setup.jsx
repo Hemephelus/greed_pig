@@ -18,6 +18,7 @@ function LiveGameSetup() {
     setIsGameOver,
     setCurrentPlayer,
     isContinue,
+    startGameLog,
   } = useLiveGameContext();
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
@@ -32,6 +33,15 @@ function LiveGameSetup() {
           total_points: 0,
         };
         return newPlayer;
+      });
+
+      startGameLog({
+        targetScore: Number(maxPoints),
+        players: newPlayerData.map((player, seat) => ({
+          seat,
+          name: (player.name || player.tag).slice(0, 30),
+          pigIndex: player.pig_index,
+        })),
       });
 
       setDiceValue(0);

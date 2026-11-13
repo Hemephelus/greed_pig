@@ -17,6 +17,8 @@ function DiceSection() {
     maxPoints,
     setIsGameOver,
     setDiceValue,
+    logRoll,
+    logPass,
   } = useLiveGameContext();
   const [isRolling, setIsRolling] = useState(false);
   const addPlayerAudio = useAudio(addPlayerSound);
@@ -28,6 +30,7 @@ function DiceSection() {
     addPlayerAudio?.play();
     let cp = currentPlayer;
     let newPlayerData = [...playerData];
+    logPass(cp, newPlayerData[cp]["running_points"]);
 
     newPlayerData[cp]["total_points"] += newPlayerData[cp]["running_points"];
     newPlayerData[cp]["running_points"] = 0;
@@ -68,6 +71,7 @@ function DiceSection() {
   function handleFinalDiceValue(diceValue) {
     let cp = currentPlayer;
     let newPlayerData = [...playerData];
+    logRoll(cp, [diceValue], diceValue === 1);
 
     if (diceValue === 1) {
       loseAudio?.play();

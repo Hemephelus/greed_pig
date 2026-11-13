@@ -16,7 +16,7 @@ function Notice({ title, children, showHome = true }) {
                 {children}
                 {showHome ? (
                     <Link
-                        to="/"
+                        to={`/sign-in?next=/room/${code}`}
                         className="sec-font rounded px-8 py-3 bg-[#d30cbcc0] font-bold hover:bg-[#d30cbc] duration-300"
                     >
                         Home

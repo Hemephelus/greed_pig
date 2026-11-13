@@ -1,101 +1,167 @@
 import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useConvexAuth, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Link, useNavigate } from "react-router-dom";
+import logo from "../assets/pig-0.png";
+
+const inputClass =
+  "w-full rounded bg-[#ffffff20] border border-[#ffffff60] px-3 py-2 text-white placeholder-[#ffffff80] focus:outline-none focus:ring-2 focus:ring-[#d30cbd]";
 
 export default function SignIn() {
-    const { signIn, signOut } = useAuthActions();
-    const navigate = useNavigate();
-    const { isAuthenticated, isLoading } = useConvexAuth();
-    const me = useQuery(api.users.me);
-    const [flow, setFlow] = useState("signIn"); // "signIn" or "signUp"
-    const [error, setError] = useState("");
-    const [submitting, setSubmitting] = useState(false);
+  const { signIn, signOut } = useAuthActions();
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
 
-    async function handleSubmit(e) {
-        e.preventDefault();
-        setError("");
-        setSubmitting(true);
-        const formData = new FormData(e.currentTarget);
-        formData.set("flow", flow);
-        try {
-            await signIn("password", formData);
-            navigate("/");
-        } catch {
-            setError(
-                flow === "signIn"
-                    ? "Wrong email or password."
-                    : "Could not create the account. Use a valid email and a password of at least 8 characters, or sign in if you already have an account."
-            );
-        } finally {
-            setSubmitting(false);
-        }
+  // Where to go after signing in, e.g. /sign-in?next=/room/ABC234.
+  // Only allow paths inside our own site.
+  const rawNext = params.get("next") ?? "/";
+  const next =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+
+  const [flow, setFlow] = useState("signIn"); // "signIn" or "signUp"
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setBusy(true);
+    const formData = new FormData(e.currentTarget);
+    formData.set("flow", flow);
+    try {
+      await signIn("password", formData);
+      navigate(next);
+    } catch {
+      setError(
+        flow === "signIn"
+          ? "Wrong email or password."
+          : "Could not create the account. Use a password of at least 8 characters, and check that the email isn't already registered."
+      );
+    } finally {
+      setBusy(false);
     }
+  }
 
-    const inputClass =
-        "p-2 bg-[#ffffff20] border rounded-md w-[280px] text-white";
+  return (
+    <section className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 py-10 text-white">
+      <Link to="/" className="flex flex-col items-center gap-2">
+        <img src={logo} alt="" width={120} />
+        <h1 className="pri-font text-4xl">Greedy Pig</h1>
+      </Link>
 
-    return (
-        <main className="min-h-screen bg-[#111111] text-white flex flex-col items-center justify-center gap-4 sec-font p-4">
-            <h1 className="pri-font text-3xl">
-                {isAuthenticated ? "You are signed in" : flow === "signIn" ? "Sign in" : "Create account"}
-            </h1>
+      <div className="w-full max-w-sm rounded-lg border border-[#ffffff40] bg-[#00000040] p-6">
+        {isLoading ? (
+          <p className="text-center opacity-80">Loading...</p>
+        ) : isAuthenticated ? (
+          <div className="flex flex-col gap-4 text-center">
+            <p className="text-lg">You're signed in.</p>
+            <button
+              onClick={() => navigate(next)}
+              className="sec-font rounded px-6 py-3 bg-[#d30cbcc0] font-bold hover:bg-[#d30cbc] duration-300"
+            >
+              Continue
+            </button>
+            <button
+              onClick={() => signOut()}
+              className="rounded px-6 py-3 font-bold border border-[#ffffff80] hover:bg-[#ffffff20] duration-300"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <h2 className="pri-font text-2xl text-center">
+              {flow === "signIn" ? "Sign in" : "Create account"}
+            </h2>
 
-            {isLoading && <p>Loading...</p>}
+            {flow === "signUp" ? (
+              <div className="flex flex-col gap-1">
+                <label htmlFor="name" className="text-sm">
+                  Display name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  autoComplete="nickname"
+                  placeholder="What should players call you?"
+                  className={inputClass}
+                />
+              </div>
+            ) : null}
 
-            {!isLoading && isAuthenticated && (
-                <>
-                    <p>
-                        Signed in as <b>{me?.name ?? me?.email ?? "..."}</b>
-                    </p>
-                    <div className="flex gap-3">
-                        <Link to="/" className="bg-[#d30cbcc0] px-6 py-2 rounded-lg font-bold">
-                            Home
-                        </Link>
-                        <Link to="/engine-test" className="bg-[#056FA4c0] px-6 py-2 rounded-lg border">
-                            Engine test
-                        </Link>
-                    </div>
-                    <button onClick={() => signOut()} className="underline text-sm">
-                        Sign out
-                    </button>
-                </>
-            )}
+            <div className="flex flex-col gap-1">
+              <label htmlFor="email" className="text-sm">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="you@example.com"
+                className={inputClass}
+              />
+            </div>
 
-            {!isLoading && !isAuthenticated && (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                    {flow === "signUp" && (
-                        <div className="flex flex-col">
-                            <label htmlFor="name">Display name</label>
-                            <input id="name" name="name" className={inputClass} required />
-                        </div>
-                    )}
-                    <div className="flex flex-col">
-                        <label htmlFor="email">Email</label>
-                        <input id="email" name="email" type="email" className={inputClass} required />
-                    </div>
-                    <div className="flex flex-col">
-                        <label htmlFor="password">Password (8+ characters)</label>
-                        <input id="password" name="password" type="password" minLength={8} className={inputClass} required />
-                    </div>
-                    {error && <p role="alert" className="text-red-400 max-w-[280px]">{error}</p>}
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="bg-[#d30cbcc0] px-6 py-2 rounded-lg font-bold disabled:opacity-50"
-                    >
-                        {submitting ? "Please wait..." : flow === "signIn" ? "Sign in" : "Create account"}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => { setFlow(flow === "signIn" ? "signUp" : "signIn"); setError(""); }}
-                        className="underline text-sm"
-                    >
-                        {flow === "signIn" ? "No account? Create one" : "Have an account? Sign in"}
-                    </button>
-                </form>
-            )}
-        </main>
-    );
+            <div className="flex flex-col gap-1">
+              <label htmlFor="password" className="text-sm">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minLength={8}
+                autoComplete={
+                  flow === "signIn" ? "current-password" : "new-password"
+                }
+                placeholder="At least 8 characters"
+                className={inputClass}
+              />
+            </div>
+
+            {error ? (
+              <p role="alert" className="text-sm text-[#ff9aa8]">
+                {error}
+              </p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={busy}
+              className="sec-font rounded px-6 py-3 bg-[#d30cbcc0] font-bold hover:bg-[#d30cbc] duration-300 disabled:opacity-60"
+            >
+              {busy
+                ? "Please wait..."
+                : flow === "signIn"
+                ? "Sign in"
+                : "Create account"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setFlow(flow === "signIn" ? "signUp" : "signIn");
+                setError("");
+              }}
+              className="text-sm underline text-center hover:text-[#d30cbc]"
+            >
+              {flow === "signIn"
+                ? "No account? Create one"
+                : "Already have an account? Sign in"}
+            </button>
+          </form>
+        )}
+      </div>
+
+      <Link to="/" className="text-sm underline opacity-80 hover:opacity-100">
+        Back to home
+      </Link>
+    </section>
+  );
 }

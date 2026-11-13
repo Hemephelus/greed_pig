@@ -16,7 +16,7 @@ function Notice({ title, children, showHome = true }) {
                 {children}
                 {showHome ? (
                     <Link
-                        to={`/sign-in?next=/room/${code}`}
+                        to="/"
                         className="sec-font rounded px-8 py-3 bg-[#d30cbcc0] font-bold hover:bg-[#d30cbc] duration-300"
                     >
                         Home
@@ -61,7 +61,7 @@ export default function RoomPage() {
             <Notice title="Sign in to join this room">
                 <p className="opacity-80">Room {code} is waiting for you.</p>
                 <Link
-                    to="/sign-in"
+                    to={`/sign-in?next=/room/${code}`}
                     className="sec-font rounded px-8 py-3 bg-[#056FA4c0] font-bold hover:bg-[#056FA4] duration-300"
                 >
                     Sign in / Sign up

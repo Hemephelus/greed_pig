@@ -24,6 +24,9 @@ export default function AuthButton() {
 
     return (
         <div className="flex items-center gap-3 text-white">
+            <Link to="/history" className="text-sm underline hover:text-[#d30cbd]">
+                History
+            </Link>
             <span className="hidden sm:inline text-sm opacity-80">
                 {me?.name ?? me?.email ?? "Signed in"}
             </span>

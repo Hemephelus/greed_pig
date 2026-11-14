@@ -1,3 +1,5 @@
+import ComputerBadge from "src/computer/ui/ComputerBadge";
+
 function CurrentPlayerMobile({ activePlayer }) {
   if (!activePlayer) return null;
 
@@ -16,6 +18,7 @@ function CurrentPlayerMobile({ activePlayer }) {
             <td className=" ">
               {" "}
               {activePlayer.name}&apos;s Turn
+              <ComputerBadge player={activePlayer} />
             </td>
             <td className="  ">{activePlayer.total_score}</td>
             <td className="  ">{activePlayer.turn_score}</td>

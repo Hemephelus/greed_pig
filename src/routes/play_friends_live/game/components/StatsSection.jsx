@@ -1,4 +1,5 @@
 import { useGameSession } from "src/context/GameSessionContext";
+import ComputerBadge from "src/computer/ui/ComputerBadge";
 
 function StatsSection() {
   const { leaderboard, activePlayer } = useGameSession();
@@ -13,7 +14,10 @@ function StatsSection() {
         >
           <img src={activePlayer.avatar} alt={activePlayer.name} />
         </figure>
-        {activePlayer.name}&apos;s Turn
+        <p>
+          {activePlayer.name}&apos;s Turn
+          <ComputerBadge player={activePlayer} />
+        </p>
       </div>
       <div className="bg-[#ffffff10]  text-lg lg:text-xl xl:text-2xl font-extrabold border-y border-[#ffffff80] py-2 lg:py-4 text-center ">
         Leader Board
@@ -40,7 +44,11 @@ function StatsSection() {
                     <img src={player.avatar} alt={player.name} />
                   </figure>
                 </td>
-                <td className=" "> {player.name}</td>
+                <td className=" ">
+                  {" "}
+                  {player.name}
+                  <ComputerBadge player={player} />
+                </td>
                 <td className="  ">
                   {player.total_score}
                 </td>

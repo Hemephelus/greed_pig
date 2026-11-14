@@ -1,4 +1,5 @@
 import { useGameSession } from "src/context/GameSessionContext";
+import ComputerBadge from "src/computer/ui/ComputerBadge";
 
 function StatsSectionMobile() {
   const { leaderboard } = useGameSession();
@@ -30,7 +31,11 @@ function StatsSectionMobile() {
                     <img src={player.avatar} alt={player.name} />
                   </figure>
                 </td>
-                <td className=" "> {player.name}</td>
+                <td className=" ">
+                  {" "}
+                  {player.name}
+                  <ComputerBadge player={player} />
+                </td>
                 <td className="  ">
                   {player.total_score}
                 </td>

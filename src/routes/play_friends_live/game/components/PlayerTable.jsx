@@ -1,3 +1,5 @@
+import ComputerBadge from "src/computer/ui/ComputerBadge";
+
 function PlayerTable({ players }) {
   return (
     <table className="hidden md:table w-full">
@@ -26,6 +28,7 @@ function PlayerTable({ players }) {
                 </td>
                 <td className="">
                   {player.name}
+                  <ComputerBadge player={player} />
                 </td>
                 <td className="">
                   {player.total_score}

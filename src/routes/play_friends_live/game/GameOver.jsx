@@ -1,15 +1,30 @@
 import React, { useRef, useState, useEffect } from "react";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
+import { useLiveGameContext } from "src/context/useLiveGameContext";
 
 function GameOver({ playerData, currentPlayer, setIsContinue }) {
   const [leaderBoard, setLeaderBoard] = useState(playerData);
   const windowWidth = useRef(window.innerWidth);
   const windowHeight = useRef(window.innerHeight);
+  const gameLogFinished = useRef(false);
+  const { finishGameLog, getGameLog } = useLiveGameContext();
 
   useEffect(() => {
     setIsContinue(false)
   }, [])
+
+  useEffect(() => {
+    if (gameLogFinished.current) return;
+    gameLogFinished.current = true;
+    const winner = [...playerData].sort(
+      (a, b) => b.total_points + b.running_points - (a.total_points + a.running_points)
+    )[0];
+    const winnerSeat = playerData.findIndex((player) => player.id === winner.id);
+    finishGameLog(winnerSeat, winner.running_points);
+    // TODO: Remove this temporary log in the next task.
+    console.log("Finished game log:", getGameLog());
+  }, [finishGameLog, getGameLog, playerData]);
 
 
   useEffect(() => {

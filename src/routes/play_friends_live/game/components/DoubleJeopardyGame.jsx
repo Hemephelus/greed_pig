@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import Navbar from "src/components/Navbar";
 import { useLiveGameContext } from "src/context/useLiveGameContext";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
@@ -10,12 +10,12 @@ import diceRollSound from "src/sound_effect/dice_roll.mp3";
 import addPlayerSound from "src/sound_effect/add_player.mp3";
 import loseSound from "src/sound_effect/lose_sound.mp3";
 import celebrationSound from "src/sound_effect/celebration.mp3";
-import PlayerTable from "./components/PlayerTable";
-import StatsSection from "./components/StatsSection";
-import StatsSectionMobile from "./components/StatsSectionMobile";
-import CurrentPlayerMobile from "./components/CurrentPlayerMobile";
-import DoubleJeopardyControls from "./components/DoubleJeopardyControls";
-import GameOver from "./GameOver";
+import PlayerTable from "./PlayerTable";
+import StatsSection from "./StatsSection";
+import StatsSectionMobile from "./StatsSectionMobile";
+import CurrentPlayerMobile from "./CurrentPlayerMobile";
+import DoubleJeopardyControls from "./DoubleJeopardyControls";
+import GameOver from "../GameOver";
 
 const randomFace = () => Math.floor(Math.random() * 6) + 1;
 
@@ -96,7 +96,10 @@ export default function DoubleJeopardyGame() {
         celebrationAudio?.play();
         setFeedback({
           tone: "saved",
-          text: `${name} reached ${liveGame.targetScore} points and wins!`,
+          text:
+            result.pointsBanked > 0
+              ? `Saved! ${result.die1} + ${result.die2}. ${name} keeps ${result.pointsBanked} points.`
+              : `${result.die1} + ${result.die2}: nothing to save, ${name}'s turn ends.`,
         });
       } else if (result.outcome === "bust") {
         loseAudio?.play();

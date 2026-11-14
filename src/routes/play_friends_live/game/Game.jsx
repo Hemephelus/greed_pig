@@ -8,7 +8,7 @@ import DiceSection from "./components/DiceSection";
 import StatsSectionMobile from "./components/StatsSectionMobile";
 import CurrentPlayerMobile from "./components/CurrentPlayerMobile";
 import DiceSectionMobile from "./components/DiceSectionMobile";
-import DoubleJeopardyGame from "./DoubleJeopardyGame";
+import DoubleJeopardyGame from "./components/DoubleJeopardyGame";
 
 export default function LiveGame() {
   const { playerData, currentPlayer, isGameOver, setIsContinue, activeMode } =

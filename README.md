@@ -1,1 +1,5 @@
-# Greedy Pig
+# Greedy Pig - CSC 419 GROUP 5. 
+
+Improvements such as an enhanced onboarding experience,...
+
+Eghogho Esele,...

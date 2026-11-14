@@ -3,11 +3,11 @@ import { useLiveGameContext } from "src/context/useLiveGameContext";
 import AddPlayerButton from "./components/AddPlayerButton";
 import NameInput from "./components/NameInput";
 import ImageSlider from "./components/ImageSlider";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSwitch from "src/components/SoundSwitch";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { ConvexError } from "convex/values";
@@ -29,13 +29,16 @@ function LiveGameSetup() {
     setGameId,
   } = useLiveGameContext();
   const navigate = useNavigate();
+  const location = useLocation();
   const createGame = useMutation(api.games.createGame);
   const [isStarting, setIsStarting] = useState(false);
   const [startError, setStartError] = useState("");
+  const [showTutorialChoice, setShowTutorialChoice] = useState(false);
+  const tutorialCompletionConsumed = useRef(false);
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
-  async function setupPlayers(resume) {
+  const setupPlayers = useCallback(async (resume, modeOverride = null) => {
     setStartError("");
     if (resume) {
       navigate("/live-game/game");
@@ -47,10 +50,11 @@ function LiveGameSetup() {
       running_points: 0,
       total_points: 0,
     }));
+    const modeToStart = modeOverride || gameMode;
 
     setIsStarting(true);
     try {
-      if (gameMode === "double_jeopardy") {
+      if (modeToStart === "double_jeopardy") {
         // The server holds the real game; the browser only shows it.
         const id = await createGame({
           mode: "double_jeopardy",
@@ -66,7 +70,7 @@ function LiveGameSetup() {
       }
 
       startGameLog({
-        mode: gameMode,
+        mode: modeToStart,
         targetScore: Number(maxPoints),
         players: newPlayerData.map((player, seat) => ({
           seat,
@@ -75,7 +79,7 @@ function LiveGameSetup() {
         })),
       });
 
-      setActiveMode(gameMode);
+      setActiveMode(modeToStart);
       setDiceValue(0);
       setIsGameOver(false);
       setCurrentPlayer(0);
@@ -91,6 +95,39 @@ function LiveGameSetup() {
         );
       }
     }
+  }, [createGame, gameMode, maxPoints, navigate, playerData, setActiveMode, setCurrentPlayer, setDiceValue, setGameId, setIsGameOver, setPlayerData, startGameLog]);
+
+  useEffect(() => {
+    if (
+      location.state?.startClassicAfterTutorial &&
+      !tutorialCompletionConsumed.current
+    ) {
+      tutorialCompletionConsumed.current = true;
+      // Clear the one-time marker before starting so a rerender or revisit cannot
+      // initialize this game a second time.
+      navigate(location.pathname, { replace: true, state: null });
+      setGameMode("classic");
+      void setupPlayers(false, "classic");
+    }
+  }, [location.pathname, location.state, navigate, setGameMode, setupPlayers]);
+
+  function handleStartNewGame() {
+    setStartError("");
+    if (gameMode === "classic") {
+      setShowTutorialChoice(true);
+      return;
+    }
+    void setupPlayers(false);
+  }
+
+  function takeTutorial() {
+    setShowTutorialChoice(false);
+    navigate("/live-game/tutorial");
+  }
+
+  function skipTutorial() {
+    setShowTutorialChoice(false);
+    void setupPlayers(false);
   }
 
   function clearsPlayers() {
@@ -173,9 +210,7 @@ function LiveGameSetup() {
             {isContinue ? (
               <>
                 <button
-                  onClick={() => {
-                    setupPlayers(false);
-                  }}
+                  onClick={handleStartNewGame}
                   className="w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
                   disabled={isStarting}
                   label={isStarting ? "Starting..." : "Start New Game"}
@@ -194,9 +229,7 @@ function LiveGameSetup() {
               </>
             ) : (
               <button
-                onClick={() => {
-                  setupPlayers(false);
-                }}
+                onClick={handleStartNewGame}
                 className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
                 disabled={isStarting}
                 label={isStarting ? "Starting..." : "Start Game"}
@@ -211,6 +244,18 @@ function LiveGameSetup() {
             </p>
           )}
         </div>
+        {showTutorialChoice && (
+          <div className="fixed inset-0 z-30 grid place-items-center bg-[#000000c0] p-4" role="dialog" aria-modal="true" aria-labelledby="classic-tutorial-title">
+            <section className="w-full max-w-lg rounded-xl border border-[#ffffff60] bg-[#111111] p-6 text-center text-white shadow-2xl">
+              <h2 id="classic-tutorial-title" className="pri-font text-2xl sm:text-3xl">Learn How to Play first?</h2>
+              <p className="my-4">Try a short guided game, or skip the tutorial and start your game now.</p>
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <button type="button" onClick={takeTutorial} className="rounded-lg bg-[#D30CBD] px-6 py-3 font-bold hover:bg-[#d30cbc]">Take Tutorial</button>
+                <button type="button" onClick={skipTutorial} className="rounded-lg border border-[#ffffff60] bg-[#ffffff10] px-6 py-3 font-bold hover:bg-[#ffffff20]">Skip Tutorial</button>
+              </div>
+            </section>
+          </div>
+        )}
       </main>
     </>
   );

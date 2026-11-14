@@ -1,4 +1,5 @@
 import Menu from "./Menu";
+import PropTypes from "prop-types";
 
 const TONES = {
   bust: "text-[#F17E8C]",
@@ -96,5 +97,29 @@ function DoubleJeopardyControls({
     </div>
   );
 }
+
+DieFace.propTypes = {
+  value: PropTypes.number,
+  faces: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+DoubleJeopardyControls.propTypes = {
+  variant: PropTypes.oneOf(["mobile", "desktop"]).isRequired,
+  faces: PropTypes.arrayOf(PropTypes.string).isRequired,
+  dice: PropTypes.arrayOf(PropTypes.number),
+  busy: PropTypes.bool.isRequired,
+  finished: PropTypes.bool.isRequired,
+  currentName: PropTypes.string.isRequired,
+  runningPoints: PropTypes.number.isRequired,
+  playerCount: PropTypes.number.isRequired,
+  maxPoints: PropTypes.number.isRequired,
+  feedback: PropTypes.shape({
+    tone: PropTypes.oneOf(["bust", "saved", "continue"]),
+    text: PropTypes.string,
+  }),
+  error: PropTypes.string,
+  onRoll: PropTypes.func.isRequired,
+  onPass: PropTypes.func.isRequired,
+};
 
 export default DoubleJeopardyControls;

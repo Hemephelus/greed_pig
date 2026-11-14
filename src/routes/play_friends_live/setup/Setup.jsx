@@ -10,6 +10,7 @@ import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { ConvexError } from "convex/values";
 
 function LiveGameSetup() {
   const {
@@ -81,11 +82,14 @@ function LiveGameSetup() {
       setPlayerData(newPlayerData);
       navigate("/live-game/game");
     } catch (error) {
-      setStartError(
-        "Couldn't start the game. Check the player names and max score, then try again.",
-      );
-    } finally {
-      setIsStarting(false);
+      if (error instanceof ConvexError && typeof error.data === "string") {
+        // A validation message we wrote ourselves, safe to show.
+        setStartError(error.data);
+      } else {
+        setStartError(
+          "Couldn't reach the game server. Check your connection and try again.",
+        );
+      }
     }
   }
 

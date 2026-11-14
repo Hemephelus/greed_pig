@@ -9,6 +9,7 @@ import Home from "./routes/Home";
 import HowToPlay from "./routes/HowToPlay";
 import LiveGame from "./routes/play_friends_live/game/Game";
 import LiveGamePage from "./routes/play_friends_live/LivePage";
+import ClassicTutorial from "./routes/play_friends_live/tutorial/ClassicTutorial";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
           {
             path: "game/",
             element: <LiveGame />,
+          },
+          {
+            path: "tutorial/",
+            element: <ClassicTutorial />,
           },
           {
             path: "how-to-play/",

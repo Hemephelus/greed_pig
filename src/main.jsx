@@ -9,6 +9,14 @@ import Home from "./routes/Home";
 import HowToPlay from "./routes/HowToPlay";
 import LiveGame from "./routes/play_friends_live/game/Game";
 import LiveGamePage from "./routes/play_friends_live/LivePage";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+
+
+const convexUrl = import.meta.env.VITE_CONVEX_URL;
+if (!convexUrl) {
+  throw new Error("VITE_CONVEX_URL is not configured");
+}
+const convex = new ConvexReactClient(convexUrl);
 
 const router = createBrowserRouter([
   {
@@ -45,6 +53,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ConvexProvider client={convex}>
+      <RouterProvider router={router} />
+    </ConvexProvider>
   </React.StrictMode>
 );

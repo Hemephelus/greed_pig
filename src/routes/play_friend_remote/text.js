@@ -1,157 +1,69 @@
-import { createClient } from '@supabase/supabase-js'
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import PropTypes from "prop-types";
+import { usePaginatedQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
-const SUPABASE_URL = 'https://jgihvfouveubffqvpzxq.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnaWh2Zm91dmV1YmZmcXZwenhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODM4MDQ4NzEsImV4cCI6MTk5OTM4MDg3MX0.9nd8R4b32DRVEoEcdeugIxEH9px5XTq0SrGQ3v3cJOk'
-
-const client = createClient(SUPABASE_URL, SUPABASE_KEY)
-
-// Join a room/topic. Can be anything except for 'realtime'.
-const channelA = clientA.channel('room-1')
-
-// Simple function to log any messages we receive
-function messageReceived(payload) {
-  console.log(payload)
-}
-
-// Subscribe to the Channel
-channelA
-  .on(
-    'broadcast',
-    { event: 'test' },
-    (payload) => messageReceived(payload)
-  )
-  .subscribe()
-
-
-  import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const AppContext = createContext({});
+const AppContext = createContext(null);
 
 const AppContextProvider = ({ children }) => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  let mySubscription = null;
   const [username, setUsername] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [error, setError] = useState("");
-  const [loadingInitial, setLoadingInitial] = useState(true);
-  const [routeHash, setRouteHash] = useState("");
-  const [isOnBottom, setIsOnBottom] = useState(false);
-  const [newIncomingMessageTrigger, setNewIncomingMessageTrigger] =
-    useState(null);
-  const [unviewedMessageCount, setUnviewedMessageCount] = useState(0);
   const [countryCode, setCountryCode] = useState("");
-
-  const getLocation = async () => {
-    try {
-      const res = await fetch("https://api.db-ip.com/v2/free/self");
-      const { countryCode, error } = await res.json();
-      if (error) throw new Error(error);
-
-      setCountryCode(countryCode);
-      localStorage.setItem("countryCode", countryCode);
-    } catch (error) {
-      console.error(
-        `error getting location from api.db-ip.com:`,
-        error.message
-      );
-    }
-  };
-
-  const randomUsername = () => {
-    return `@user${Date.now().toString().substr(-4)}`;
-  };
-  
-  const initializeUser = () => {
-    const user = supabase.auth.user();
-    let username;
-    if (user) {
-      username = user.user_metadata.user_name;
-    } else {
-      username = localStorage.getItem("username") || randomUsername();
-    }
-    setUsername(username);
-    localStorage.setItem("username", username);
-  };
+  const [unviewedMessageCount, setUnviewedMessageCount] = useState(0);
+  const [isOnBottom, setIsOnBottom] = useState(false);
+  const scrollRef = useRef(null);
+  const latestMessageId = useRef(null);
+  const { results: messages, status, loadMore } = usePaginatedQuery(
+    api.messages.list,
+    {},
+    { initialNumItems: 50 }
+  );
 
   useEffect(() => {
-    initializeUser();
-    getMessagesAndSubscribe();
-
-    // const storedUser = localStorage.getItem("username");
-    // if (storedUser) setUsername(storedUser);
-    // else setUsername(`@user${Date.now().toString().substr(-4)}`);
+    const storedUsername = localStorage.getItem("username");
+    const currentUsername =
+      storedUsername || `@user${Date.now().toString().slice(-4)}`;
+    setUsername(currentUsername);
+    localStorage.setItem("username", currentUsername);
 
     const storedCountryCode = localStorage.getItem("countryCode");
-    if (storedCountryCode && storedCountryCode !== "undefined")
+    if (storedCountryCode && storedCountryCode !== "undefined") {
       setCountryCode(storedCountryCode);
-    else getLocation();
+      return;
+    }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      console.log("onAuthStateChange", { event, session });
-      if (event === "SIGNED_IN") initializeUser();
-    });
-    // const { hash, pathname } = window.location;
-    // if (hash && pathname === "/") {
-    //   console.log("hash", hash);
-    //   setRouteHash(hash);
-    // }
-
-    return () => {
-      supabase.removeSubscription();
-      console.log("Remove supabase subscription by useEffect unmount");
-    };
+    fetch("https://api.db-ip.com/v2/free/self")
+      .then((response) => response.json())
+      .then(({ countryCode: detectedCountryCode }) => {
+        if (!detectedCountryCode) return;
+        setCountryCode(detectedCountryCode);
+        localStorage.setItem("countryCode", detectedCountryCode);
+      })
+      .catch((error) => console.error("Could not detect country:", error));
   }, []);
 
   useEffect(() => {
-    if (newIncomingMessageTrigger?.username === username) scrollToBottom();
-    else setUnviewedMessageCount((prevCount) => prevCount + 1);
-  }, [newIncomingMessageTrigger]);
+    if (status === "LoadingFirstPage" || !messages?.length) return;
 
-  const handleNewMessage = (payload) => {
-    setMessages((prevMessages) => [payload.new, ...prevMessages]);
-    //* needed to trigger react state because I need access to the username state
-    setNewIncomingMessageTrigger(payload.new);
-  };
+    const latestMessage = messages[0];
+    if (latestMessageId.current === null) {
+      latestMessageId.current = latestMessage._id;
+      return;
+    }
 
-  const getInitialMessages = async () => {
-    if (!messages.length) {
-      const { data, error } = await supabase
-        .from("messages")
-        .select()
-        .range(0, 49)
-        .order("id", { ascending: false });
-      // console.log(`data`, data);
-      setLoadingInitial(false);
-      if (error) {
-        setError(error.message);
-        supabase.removeSubscription(mySubscription);
-        mySubscription = null;
-        return;
-      }
-      setMessages(data);
-      scrollToBottom();
+    if (latestMessageId.current !== latestMessage._id) {
+      latestMessageId.current = latestMessage._id;
+      if (latestMessage.username === username) scrollToBottom();
+      else setUnviewedMessageCount((count) => count + 1);
+    }
+  }, [messages, status, username]);
+
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   };
 
-  const getMessagesAndSubscribe = async () => {
-    setError("");
-    if (!mySubscription) {
-      getInitialMessages();
-      mySubscription = supabase
-        .from("messages")
-        .on("*", (payload) => {
-          handleNewMessage(payload);
-        })
-        .subscribe();
-    }
-  };
-
-  const scrollRef = useRef();
-  const onScroll = async ({ target }) => {
+  const onScroll = ({ target }) => {
     if (target.scrollHeight - target.scrollTop <= target.clientHeight + 1) {
       setUnviewedMessageCount(0);
       setIsOnBottom(true);
@@ -159,41 +71,22 @@ const AppContextProvider = ({ children }) => {
       setIsOnBottom(false);
     }
 
-    //* Load more messages when reaching top
-    if (target.scrollTop === 0) {
-      // console.log("messages.length :>> ", messages.length);
-      const { data, error } = await supabase
-        .from("messages")
-        .select()
-        .range(messages.length, messages.length + 49)
-        .order("id", { ascending: false });
-      if (error) {
-        setError(error.message);
-        return;
-      }
+    if (target.scrollTop === 0 && status === "CanLoadMore") {
+      loadMore(50);
       target.scrollTop = 1;
-      setMessages((prevMessages) => [...prevMessages, ...data]);
     }
-  };
-
-  const scrollToBottom = () => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   };
 
   return (
     <AppContext.Provider
       value={{
-        supabase,
-        auth: supabase.auth,
-        messages,
-        loadingInitial,
-        error,
-        getMessagesAndSubscribe,
+        messages: messages ?? [],
+        loadingInitial: status === "LoadingFirstPage",
+        error: "",
         username,
         setUsername,
-        randomUsername,
-        routeHash,
+        randomUsername: () => `@user${Date.now().toString().slice(-4)}`,
+        routeHash: "",
         scrollRef,
         onScroll,
         scrollToBottom,
@@ -207,7 +100,16 @@ const AppContextProvider = ({ children }) => {
   );
 };
 
-const useAppContext = () => useContext(AppContext);
+AppContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used inside AppContextProvider");
+  }
+  return context;
+};
 
 export { AppContext as default, AppContextProvider, useAppContext };
-

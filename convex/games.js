@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { applyDoubleJeopardyRoll } from "./lib/doubleJeopardyRules";
 
@@ -54,7 +54,9 @@ export const createGame = mutation({
       args.players.length < MIN_PLAYERS ||
       args.players.length > MAX_PLAYERS
     ) {
-      throw new Error(`A game needs ${MIN_PLAYERS} to ${MAX_PLAYERS} players`);
+      throw new ConvexError(
+        `A game needs ${MIN_PLAYERS} to ${MAX_PLAYERS} players`,
+      );
     }
     if (
       !Number.isInteger(args.targetScore) ||

@@ -86,7 +86,10 @@ export default function DoubleJeopardyGame() {
         [result.die1, result.die2],
         result.outcome === "bust",
       );
-      if (result.outcome === "saved" && result.status === "active") {
+      if (
+        result.outcome === "saved" ||
+        (result.outcome === "continue" && result.status === "finished")
+      ) {
         logPass(result.playerIndex, result.pointsBanked);
       }
 
@@ -144,9 +147,7 @@ export default function DoubleJeopardyGame() {
     try {
       const result = await passTurn({ gameId });
       const name = liveGame.players[result.playerIndex].name;
-      if (result.status === "active") {
-        logPass(result.playerIndex, result.pointsBanked);
-      }
+      logPass(result.playerIndex, result.pointsBanked);
       setDiceValue(0);
 
       if (result.status === "finished") {

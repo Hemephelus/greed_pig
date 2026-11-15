@@ -9,8 +9,10 @@
  */
 
 import type * as games from "../games.js";
+import type * as lib_computeStats from "../lib/computeStats.js";
 import type * as lib_doubleJeopardyRules from "../lib/doubleJeopardyRules.js";
 import type * as messages from "../messages.js";
+import type * as stats from "../stats.js";
 
 import type {
   ApiFromModules,
@@ -20,8 +22,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   games: typeof games;
+  "lib/computeStats": typeof lib_computeStats;
   "lib/doubleJeopardyRules": typeof lib_doubleJeopardyRules;
   messages: typeof messages;
+  stats: typeof stats;
 }>;
 
 /**

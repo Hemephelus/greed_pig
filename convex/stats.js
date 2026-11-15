@@ -179,6 +179,7 @@ export const listRecentGames = query({
   },
 });
 
+//fake game stats
 export const seedFakeGame = internalMutation({
   args: {},
   handler: async (ctx) => await saveGameLog(ctx, {

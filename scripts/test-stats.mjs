@@ -1,4 +1,5 @@
 import { computeStats } from "../convex/lib/computeStats.js";
+import process from "node:process";
 
 const checks = [
   {

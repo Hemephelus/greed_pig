@@ -37,6 +37,9 @@ export default function LiveGame() {
     {
       roll: () => pressShortcutButton("roll"),
       bank: () => pressShortcutButton("bank"),
+      usePowerup1: () => pressShortcutButton("powerup-1"),
+      usePowerup2: () => pressShortcutButton("powerup-2"),
+      usePowerup3: () => pressShortcutButton("powerup-3"),
       toggleSound: () => setHasSound((on) => !on),
       toggleHelp: () => setHelpOpen((open) => !open),
     },

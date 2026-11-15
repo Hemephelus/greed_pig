@@ -10,6 +10,7 @@ import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
 import PowerUpTray from "src/components/powerups/PowerUpTray";
 import Kbd from "src/components/Kbd";
 
+import PowerUpFeedback from "src/components/powerups/PowerUpFeedback";
 
 function DiceSectionMobile({ locked = false }) {
   const { setChangeBackground } = useLiveGameContext();
@@ -61,6 +62,7 @@ function DiceSectionMobile({ locked = false }) {
           locked={locked}
         />
         <PowerUpTray locked={locked} variant="row" />
+        <PowerUpFeedback />
 
         <Menu />
         <div className="text-white flex justify-between w-full">

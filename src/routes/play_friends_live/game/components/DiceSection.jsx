@@ -9,6 +9,7 @@ import useAudio from "src/hooks/useAudio";
 import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
 import PowerUpTray from "src/components/powerups/PowerUpTray";
 import Kbd from "src/components/Kbd";
+import PowerUpFeedback from "src/components/powerups/PowerUpFeedback";
 
 function DiceSection({ locked = false }) {
   const { setChangeBackground } = useLiveGameContext();
@@ -48,7 +49,8 @@ function DiceSection({ locked = false }) {
         setChangeBackground={setChangeBackground}
         locked={locked}
       />
-      <PowerUpTray locked = {locked} />
+       <PowerUpTray locked={locked} />
+      <PowerUpFeedback />
       
       <button
         type="button"

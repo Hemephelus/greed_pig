@@ -115,11 +115,13 @@ export default function LiveGame() {
       <StatsSection players={players} activePlayer={activePlayer} />
       <StatsSectionMobile players={players} activePlayer={activePlayer} />
       {phase === PHASE.WON ? <GameOver /> : null}
-      <ShortcutHelp
-        open={helpOpen}
-        onOpen={() => setHelpOpen(true)}
-        onClose={() => setHelpOpen(false)}
-      />
+      {phase !== PHASE.WON ? (
+        <ShortcutHelp
+          open={helpOpen}
+          onOpen={() => setHelpOpen(true)}
+          onClose={() => setHelpOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

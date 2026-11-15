@@ -8,6 +8,8 @@ import addPlayerSound from "src/sound_effect/add_player.mp3";
 import useAudio from "src/hooks/useAudio";
 import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
 import PowerUpTray from "src/components/powerups/PowerUpTray";
+import Kbd from "src/components/Kbd";
+
 import PowerUpFeedback from "src/components/powerups/PowerUpFeedback";
 
 function DiceSectionMobile({ locked = false }) {
@@ -47,9 +49,10 @@ function DiceSectionMobile({ locked = false }) {
           type="button"
           className="bg-[#056FA480] w-[200px] md:w-full  text-white text-center text-base lg:text-xl xl:text-2xl font-semibold py-2 lg:py-4 rounded border hover:scale-105 active:scale-100 duration-300 disabled:opacity-50 disabled:hover:scale-100"
           onClick={handlePassClick}
+          data-shortcut="bank"
           disabled={isDisabled}
         >
-          PASS
+          PASS <Kbd className="ml-2 align-middle">B</Kbd>
         </button>
 
           <Dice

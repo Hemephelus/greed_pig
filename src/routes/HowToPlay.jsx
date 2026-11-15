@@ -4,6 +4,7 @@ import { AiFillHome } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import BackButton from "src/components/BackButton";
 import { DIFFICULTY_LEVELS } from "src/computer/difficulty";
+import ShortcutList from "src/components/ShortcutList";
 import {
   MIN_PLAYERS,
   MAX_PLAYERS,
@@ -141,6 +142,18 @@ export default function HowToPlay() {
                 </li>
               ))}
             </ul>
+          </section>
+        </section>
+
+        <section className="text-white space-y-4">
+          <h1 className="pri-font text-2xl lg:text-4xl">KEYBOARD SHORTCUTS</h1>
+          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg">
+            <p className="mb-4">
+              On a computer you can play without the mouse. Keys do exactly what the
+              buttons do, and they don&apos;t work while you&apos;re typing in a box. Press{" "}
+              <b>?</b> during a game to see this list.
+            </p>
+            <ShortcutList />
           </section>
         </section>
 

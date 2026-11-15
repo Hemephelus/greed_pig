@@ -32,5 +32,17 @@ export function closeGameLogTurn(log, seat, outcome, pointsBanked) {
 
 // Set the winner after closing their final, unpassed turn.
 export function finishGameLog(log, winnerSeat, winnerRunningPoints) {
-  return { ...closeGameLogTurn(log, winnerSeat, "banked", winnerRunningPoints), winnerSeat };
+  if (!log) return log;
+  const lastIndex = log.turns.length - 1;
+  const lastTurn = log.turns[lastIndex];
+  if (lastTurn?.seat === winnerSeat && lastTurn.outcome === null) {
+    const turns = [...log.turns];
+    turns[turns.length - 1] = {
+      ...lastTurn,
+      outcome: "banked",
+      pointsBanked: winnerRunningPoints,
+    };
+    return { ...log, turns, winnerSeat };
+  }
+  return { ...log, winnerSeat };
 }

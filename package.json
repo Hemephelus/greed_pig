@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
+    "test:stats": "node scripts/test-stats.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

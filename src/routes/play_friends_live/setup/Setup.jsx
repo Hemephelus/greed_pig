@@ -75,7 +75,6 @@ function LiveGameSetup() {
         players: newPlayerData.map((player, seat) => ({
           seat,
           name: (player.name || player.tag).slice(0, 30),
-          pigIndex: player.pig_index,
         })),
       });
 

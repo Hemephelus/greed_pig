@@ -7,6 +7,7 @@ import { Dice } from "src/components/Dice";
 import addPlayerSound from "src/sound_effect/add_player.mp3";
 import useAudio from "src/hooks/useAudio";
 import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
+import PowerUpTray from "src/components/powerups/PowerUpTray";
 
 function DiceSection({ locked = false }) {
   const { setChangeBackground } = useLiveGameContext();
@@ -46,6 +47,8 @@ function DiceSection({ locked = false }) {
         setChangeBackground={setChangeBackground}
         locked={locked}
       />
+      <PowerUpTray locked = {locked} />
+      
       <button
         type="button"
         className="bg-[#056FA4c0] w-full  text-white text-center text-base lg:text-xl xl:text-2xl font-semibold py-2 lg:py-4 rounded-lg border hover:scale-105 active:scale-100 duration-300 disabled:opacity-50 disabled:hover:scale-100"

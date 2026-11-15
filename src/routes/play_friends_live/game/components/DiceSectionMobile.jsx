@@ -7,6 +7,7 @@ import { Dice } from "src/components/Dice";
 import addPlayerSound from "src/sound_effect/add_player.mp3";
 import useAudio from "src/hooks/useAudio";
 import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
+import PowerUpTray from "src/components/powerups/PowerUpTray";
 
 
 function DiceSectionMobile({ locked = false }) {
@@ -41,7 +42,7 @@ function DiceSectionMobile({ locked = false }) {
     isRolling || isBusy || locked || justBanked || phase !== PHASE.PLAYING;
 
   return (
-    <div className="relative border-r-[#ffffff40] border-r md:hidden flex flex-col items-center justify-around px-2 bg-[#00000010] h-[60vh] ">
+    <div className="relative border-r-[#ffffff40] border-r md:hidden flex flex-col items-center justify-around px-2 bg-[#00000010] min-h-[60vh] ">
          <button
           type="button"
           className="bg-[#056FA480] w-[200px] md:w-full  text-white text-center text-base lg:text-xl xl:text-2xl font-semibold py-2 lg:py-4 rounded border hover:scale-105 active:scale-100 duration-300 disabled:opacity-50 disabled:hover:scale-100"
@@ -51,13 +52,13 @@ function DiceSectionMobile({ locked = false }) {
           PASS
         </button>
 
-                <Dice
+          <Dice
           setIsRolling={setIsRolling}
           isRolling={isRolling}
           setChangeBackground={setChangeBackground}
           locked={locked}
         />
-
+        <PowerUpTray locked={locked} variant="row" />
 
         <Menu />
         <div className="text-white flex justify-between w-full">

@@ -1,4 +1,6 @@
+/* eslint-disable react/prop-types */
 import ComputerBadge from "src/computer/ui/ComputerBadge";
+import StatusBadges from "src/components/powerups/StatusBadges";
 
 function PlayerTable({ players }) {
   return (
@@ -29,6 +31,7 @@ function PlayerTable({ players }) {
                 <td className="">
                   {player.name}
                   <ComputerBadge player={player} />
+                  <StatusBadges player={player} />
                 </td>
                 <td className="">
                   {player.total_score}

@@ -8,9 +8,8 @@ export function formatPlayer(row, powerups = []) {
     name: row.name,
     total_score: row.total_score,
     turn_score: row.turn_score,
-    shield_active: row.shield_active,
-    double_active: row.double_active,
-    skip_next_turn: row.skip_next_turn,
+    mud_bath_active: row.mud_bath_active,
+    halve_next_bank: row.halve_next_bank,
     powerups: powerups
       .filter((p) => p.player_id === row.id && p.status === "AVAILABLE")
       .map((p) => ({ id: p.id, type: p.type })),

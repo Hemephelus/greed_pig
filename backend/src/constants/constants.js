@@ -1,0 +1,9 @@
+export const POWERUP_EARN_MIN_LOST = 10
+export const MAX_POWERUPS_HELD = 3
+
+export const POWERUP_TYPES = [
+  "TRUFFLE_SNIFF",
+  "PIGGY_BANK",
+  "MUD_BATH",
+  "MUDDY_TROTTERS"
+]

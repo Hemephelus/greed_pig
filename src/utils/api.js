@@ -33,6 +33,10 @@ export const api = {
     request("/api/games", { method: "POST", body: JSON.stringify({ playerName }) }),
   getGame: (id) => request(`/api/games/${id}`),
 
+  // Live game: one server game for everyone at the table
+  createLiveGame: (playerNames, maxPoints) =>
+    post("/api/games", { playerNames, maxPoints }),
+
   // Lucky Shield / game actions: the server rolls the dice and applies the shield rules
   roll: (gameId, playerId) => post(`/api/games/${gameId}/roll`, { playerId }),
   pass: (gameId, playerId) => post(`/api/games/${gameId}/pass`, { playerId }),

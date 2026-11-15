@@ -7,6 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import SoundSwitch from "src/components/SoundSwitch";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
+import { useState } from "react";
+import { api } from "src/utils/api";
+import { applyServerGame } from "src/utils/live_game/serverGame";
+
+const MIN_SCORE = 25;
+const MAX_SCORE = 1000;
 
 function LiveGameSetup() {
   const {
@@ -18,27 +24,50 @@ function LiveGameSetup() {
     setIsGameOver,
     setCurrentPlayer,
     isContinue,
+    setGameId,
+    setPendingShieldPlayer,
   } = useLiveGameContext();
+  const [isStarting, setIsStarting] = useState(false);
+  const [startError, setStartError] = useState("");
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
-  function setupPlayers(resume) {
-    if (!resume) {
-      let newPlayerData = playerData.map((player) => {
-        let newPlayer = {
-          ...player,
-          running_points: 0,
-          total_points: 0,
-        };
-        return newPlayer;
-      });
+  // Creates the game on the server, then opens the game screen
+  async function startNewGame() {
+    const points = Number(maxPoints);
+    if (!Number.isInteger(points) || points < MIN_SCORE || points > MAX_SCORE) {
+      setStartError(`Max score must be a whole number between ${MIN_SCORE} and ${MAX_SCORE}.`);
+      return;
+    }
 
+    // Players who left their name empty use their pig's name
+    const playerNames = playerData.map((player) => player.name.trim() || player.tag);
+
+    setIsStarting(true);
+    setStartError("");
+    try {
+      const game = await api.createLiveGame(playerNames, points);
+
+      // Save the server ids on each player (matched by seat order)
+      const { players, currentPlayer } = applyServerGame(playerData, game);
+      setGameId(game.id);
+      setPlayerData(players);
+      setCurrentPlayer(currentPlayer);
+      setMaxPoints(game.max_points);
       setDiceValue(0);
       setIsGameOver(false);
-      setCurrentPlayer(0);
-      setPlayerData(newPlayerData);
+      setPendingShieldPlayer(null);
+      navigate("/live-game/game");
+    } catch (err) {
+      setStartError(err.message);
+    } finally {
+      setIsStarting(false);
     }
+  }
+
+  // The game is still saved on the server, so just go back to it
+  function resumeGame() {
     navigate("/live-game/game");
   }
 
@@ -55,7 +84,8 @@ function LiveGameSetup() {
             <label htmlFor="">Max Score</label>
             <input
               type="number"
-              min={25}
+              min={MIN_SCORE}
+              max={MAX_SCORE}
               value={maxPoints}
               onChange={(e) => {
                 setMaxPoints(e.target.value);
@@ -86,28 +116,41 @@ function LiveGameSetup() {
             </button>
             <SoundSwitch />
           </div>
+          {startError && (
+            <p role="alert" className="rounded-lg border border-red-400/50 bg-red-500/20 px-4 py-2 text-center text-sm text-red-100">
+              {startError}
+            </p>
+          )}
+          {isStarting && (
+            <p aria-live="polite" className="text-center text-sm text-white/80">
+              Creating your game... (the server can take up to a minute to wake up)
+            </p>
+          )}
           <section className="flex gap-4 flex-wrap justify-center">
             {isContinue ? (
               <>
                 <button
-                  onClick={() => {setupPlayers(false)}}
-                  className="w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                  onClick={startNewGame}
+                  disabled={isStarting}
+                  className="disabled:opacity-60 w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
                 >
-                  Start New Game
+                  {isStarting ? "Starting..." : "Start New Game"}
                 </button>
                 <button
-                  onClick={() => {setupPlayers(true)}}
-                  className="w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 -skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                  onClick={resumeGame}
+                  disabled={isStarting}
+                  className="disabled:opacity-60 w-full md:w-fit sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 -skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
                 >
                   Resume Game
                 </button>
               </>
             ) : (
               <button
-                onClick={() => {setupPlayers(false)}}
-                className=" sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
+                onClick={startNewGame}
+                disabled={isStarting}
+                className="disabled:opacity-60 sec-font text-xl rounded px-16 py-4 bg-[#D30CBD] font-bold  duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
               >
-                Start Game
+                {isStarting ? "Starting..." : "Start Game"}
               </button>
             )}
           </section>

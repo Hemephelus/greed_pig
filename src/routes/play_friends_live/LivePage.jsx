@@ -18,6 +18,7 @@ function LiveGamePage() {
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [pendingShieldPlayer, setPendingShieldPlayer] =
   useState(null);
+  const [gameId, setGameId] = useState(null); // id of the game saved on the server
   
   return (
     <>
@@ -54,6 +55,8 @@ function LiveGamePage() {
             setIsContinue,
             pendingShieldPlayer,
             setPendingShieldPlayer,
+            gameId,
+            setGameId,
           }}
         >
           <Outlet />

@@ -10,6 +10,7 @@ import HowToPlay from "./routes/HowToPlay";
 import LiveGame from "./routes/play_friends_live/game/Game";
 import LiveGamePage from "./routes/play_friends_live/LivePage";
 import ClassicTutorial from "./routes/play_friends_live/tutorial/ClassicTutorial";
+import DoubleJeopardyTutorial from "./routes/play_friends_live/tutorial/DoubleJeopardyTutorial";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
           {
             path: "tutorial/",
             element: <ClassicTutorial />,
+          },
+          {
+            path: "double-jeopardy-tutorial/",
+            element: <DoubleJeopardyTutorial />,
           },
           {
             path: "how-to-play/",

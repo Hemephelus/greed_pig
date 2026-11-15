@@ -97,22 +97,23 @@ function LiveGameSetup() {
   }, [createGame, gameMode, maxPoints, navigate, playerData, setActiveMode, setCurrentPlayer, setDiceValue, setGameId, setIsGameOver, setPlayerData, startGameLog]);
 
   useEffect(() => {
+    const startMode = location.state?.startGameAfterTutorial;
     if (
-      location.state?.startClassicAfterTutorial &&
+      (startMode === "classic" || startMode === "double_jeopardy") &&
       !tutorialCompletionConsumed.current
     ) {
       tutorialCompletionConsumed.current = true;
       // Clear the one-time marker before starting so a rerender or revisit cannot
       // initialize this game a second time.
       navigate(location.pathname, { replace: true, state: null });
-      setGameMode("classic");
-      void setupPlayers(false, "classic");
+      setGameMode(startMode);
+      void setupPlayers(false, startMode);
     }
   }, [location.pathname, location.state, navigate, setGameMode, setupPlayers]);
 
   function handleStartNewGame() {
     setStartError("");
-    if (gameMode === "classic") {
+    if (gameMode === "classic" || gameMode === "double_jeopardy") {
       setShowTutorialChoice(true);
       return;
     }
@@ -121,7 +122,11 @@ function LiveGameSetup() {
 
   function takeTutorial() {
     setShowTutorialChoice(false);
-    navigate("/live-game/tutorial");
+    navigate(
+      gameMode === "double_jeopardy"
+        ? "/live-game/double-jeopardy-tutorial"
+        : "/live-game/tutorial",
+    );
   }
 
   function skipTutorial() {
@@ -244,9 +249,9 @@ function LiveGameSetup() {
           )}
         </div>
         {showTutorialChoice && (
-          <div className="fixed inset-0 z-30 grid place-items-center bg-[#000000c0] p-4" role="dialog" aria-modal="true" aria-labelledby="classic-tutorial-title">
+          <div className="fixed inset-0 z-30 grid place-items-center bg-[#000000c0] p-4" role="dialog" aria-modal="true" aria-labelledby="tutorial-choice-title">
             <section className="w-full max-w-lg rounded-xl border border-[#ffffff60] bg-[#111111] p-6 text-center text-white shadow-2xl">
-              <h2 id="classic-tutorial-title" className="pri-font text-2xl sm:text-3xl">Learn How to Play first?</h2>
+              <h2 id="tutorial-choice-title" className="pri-font text-2xl sm:text-3xl">Learn {gameMode === "classic" ? "Classic" : "Double Jeopardy"} first?</h2>
               <p className="my-4">Try a short guided game, or skip the tutorial and start your game now.</p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
                 <button type="button" onClick={takeTutorial} className="rounded-lg bg-[#D30CBD] px-6 py-3 font-bold hover:bg-[#d30cbc]">Take Tutorial</button>

@@ -186,7 +186,7 @@ export default function ClassicTutorial() {
             <Link
               to="/live-game/setup"
               replace
-              state={{ startClassicAfterTutorial: true }}
+              state={{ startGameAfterTutorial: "classic" }}
               className="text-center sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc]"
             >
               Start game

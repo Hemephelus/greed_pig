@@ -35,6 +35,12 @@ function DoubleJeopardyControls({
   maxPoints,
   feedback,
   error,
+  allowRoll = true,
+  allowPass = true,
+  highlightDice = false,
+  highlightRoll = false,
+  highlightPass = false,
+  wrapFeedback = false,
   onRoll,
   onPass,
 }) {
@@ -46,14 +52,14 @@ function DoubleJeopardyControls({
     "w-full text-white text-center text-base lg:text-xl font-semibold py-2 lg:py-4 rounded-lg border hover:scale-105 active:scale-100 duration-300 disabled:opacity-50 disabled:hover:scale-100";
 
   return (
-    <div className={wrapper}>
+    <div className={`${wrapper} ${wrapFeedback ? "min-w-0" : ""}`}>
       <p className="text-white text-center text-sm lg:text-base">
         {finished
           ? "Game over"
           : `${currentName}'s turn · ${runningPoints} points this turn`}
       </p>
 
-      <div className="flex justify-center gap-2 w-full">
+      <div className={`flex justify-center gap-2 w-full rounded-lg ${highlightDice ? "ring-4 ring-[#FFEA70]" : ""}`}>
         <DieFace value={dice?.[0]} faces={faces} />
         <DieFace value={dice?.[1]} faces={faces} />
       </div>
@@ -61,7 +67,7 @@ function DoubleJeopardyControls({
       <div
         role="status"
         aria-live="polite"
-        className="min-h-[3rem] text-center text-sm lg:text-base px-1"
+        className={`min-h-[3rem] text-center text-sm lg:text-base px-1 ${wrapFeedback ? "w-full min-w-0 [overflow-wrap:anywhere]" : ""}`}
       >
         {feedback && <p className={TONES[feedback.tone]}>{feedback.text}</p>}
         {error && (
@@ -75,16 +81,16 @@ function DoubleJeopardyControls({
         <button
           type="button"
           onClick={onRoll}
-          disabled={busy || finished}
-          className={`${button} bg-[#D30CBD]`}
+          disabled={busy || finished || !allowRoll}
+          className={`${button} bg-[#D30CBD] ${highlightRoll ? "ring-4 ring-[#FFEA70]" : ""}`}
         >
           {busy ? "ROLLING..." : "ROLL"}
         </button>
         <button
           type="button"
           onClick={onPass}
-          disabled={busy || finished}
-          className={`${button} bg-[#056FA4c0]`}
+          disabled={busy || finished || !allowPass}
+          className={`${button} bg-[#056FA4c0] ${highlightPass ? "ring-4 ring-[#FFEA70]" : ""}`}
         >
           PASS
         </button>
@@ -118,6 +124,12 @@ DoubleJeopardyControls.propTypes = {
     text: PropTypes.string,
   }),
   error: PropTypes.string,
+  allowRoll: PropTypes.bool,
+  allowPass: PropTypes.bool,
+  highlightDice: PropTypes.bool,
+  highlightRoll: PropTypes.bool,
+  highlightPass: PropTypes.bool,
+  wrapFeedback: PropTypes.bool,
   onRoll: PropTypes.func.isRequired,
   onPass: PropTypes.func.isRequired,
 };

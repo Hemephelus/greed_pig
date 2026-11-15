@@ -64,9 +64,15 @@ async function saveGameLog(ctx, input) {
     if (!Number.isInteger(turn.seat) || turn.seat < 0 || turn.seat >= players.length) {
       throw new Error(`Turn ${turnIndex + 1} has a seat outside the player range`);
     }
-    if (!turn.rolls.length) throw new Error(`Turn ${turnIndex + 1} must contain a roll`);
     if (!Number.isInteger(turn.pointsBanked) || turn.pointsBanked < 0) {
       throw new Error(`Turn ${turnIndex + 1} has invalid pointsBanked`);
+    }
+    // Passing before rolling is a valid zero-point banked turn.
+    if (
+      turn.rolls.length === 0 &&
+      (turn.outcome !== "banked" || turn.pointsBanked !== 0)
+    ) {
+      throw new Error(`Turn ${turnIndex + 1} without rolls must bank zero points`);
     }
     for (const roll of turn.rolls) {
       if (roll.length !== expectedDiceCount) {
@@ -77,10 +83,12 @@ async function saveGameLog(ctx, input) {
       }
     }
 
-    const lastRoll = turn.rolls[turn.rolls.length - 1];
     let expectedPoints = 0;
     let expectedOutcome = "banked";
-    if (input.mode === "classic") {
+    if (turn.rolls.length === 0) {
+      // No roll means the player passed immediately, so nothing was banked.
+    } else if (input.mode === "classic") {
+      const lastRoll = turn.rolls[turn.rolls.length - 1];
       if (turn.rolls.slice(0, -1).some((roll) => roll[0] === 1)) {
         throw new Error(`Turn ${turnIndex + 1} rolled a 1 before its last roll`);
       }
@@ -89,6 +97,7 @@ async function saveGameLog(ctx, input) {
         expectedPoints = turn.rolls.reduce((sum, roll) => sum + roll[0], 0);
       }
     } else {
+      const lastRoll = turn.rolls[turn.rolls.length - 1];
       const firstOne = turn.rolls.findIndex((roll) => roll.includes(1));
       if (firstOne !== -1 && firstOne !== turn.rolls.length - 1) {
         throw new Error(`Turn ${turnIndex + 1} rolled a 1 before its last roll`);
@@ -125,6 +134,7 @@ async function saveGameLog(ctx, input) {
     winnerSeat: log.winnerSeat,
     luckiestSeat: stats.luckiestSeat,
     bestRiskTakerSeat: stats.bestRiskTakerSeat,
+    extraAwards: stats.extraAwards,
     finishedAt: Date.now(),
     turns: log.turns,
   });
@@ -195,6 +205,7 @@ export const seedFakeGame = internalMutation({
     turns: [
       { seat: 0, rolls: [[4], [5]], outcome: "banked", pointsBanked: 9 },
       { seat: 1, rolls: [[2], [1]], outcome: "bust", pointsBanked: 0 },
+      { seat: 1, rolls: [[4], [5], [1]], outcome: "bust", pointsBanked: 0 },
       { seat: 2, rolls: [[6], [2], [3]], outcome: "banked", pointsBanked: 11 },
       { seat: 3, rolls: [[5], [6]], outcome: "banked", pointsBanked: 11 },
       { seat: 0, rolls: [[6], [4]], outcome: "banked", pointsBanked: 10 },
@@ -205,5 +216,22 @@ export const seedFakeGame = internalMutation({
       { seat: 3, rolls: [[6], [6], [6], [6]], outcome: "banked", pointsBanked: 24 },
     ],
     winnerSeat: 3,
+  }).then(async (classicGameId) => {
+    const doubleJeopardyGameId = await saveGameLog(ctx, {
+      clientGameId: "fake-stats-game-double-jeopardy",
+      mode: "double_jeopardy",
+      targetScore: 50,
+      players: [
+        { seat: 0, name: "Efe" },
+        { seat: 1, name: "Fola" },
+      ],
+      turns: [
+        { seat: 0, rolls: [[4, 5], [1, 3]], outcome: "banked", pointsBanked: 9 },
+        { seat: 1, rolls: [[6, 6], [6, 5], [1, 2]], outcome: "bust", pointsBanked: 0 },
+        { seat: 0, rolls: [[6, 6], [6, 6], [6, 6], [6, 6]], outcome: "banked", pointsBanked: 48 },
+      ],
+      winnerSeat: 0,
+    });
+    return { classicGameId, doubleJeopardyGameId };
   }),
 });

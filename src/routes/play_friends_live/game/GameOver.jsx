@@ -5,6 +5,9 @@ import { useGameSession } from "src/context/GameSessionContext";
 import celebrationSound from "src/sound_effect/celebration.mp3";
 import useAudio from "src/hooks/useAudio";
 import { useVsComputerResult } from "src/computer/ui/useVsComputerResult";
+import { SHORTCUTS } from "src/constants/shortcuts";
+import { useGameShortcuts, pressShortcutButton } from "src/hooks/useGameShortcuts";
+import Kbd from "src/components/Kbd";
 
 function GameOver() {
   const { winner, leaderboard, resetGame } = useGameSession();
@@ -20,6 +23,12 @@ function GameOver() {
   const vsComputer = useVsComputerResult(champion);
   // No party when the computer beats you
   const celebrate = vsComputer?.celebrate ?? true;
+
+  // K2: N = Play Again, H = Home. They press the real links, so resetGame runs too.
+  useGameShortcuts(SHORTCUTS.gameOver, {
+    playAgain: () => pressShortcutButton("play-again"),
+    home: () => pressShortcutButton("home"),
+  });
 
   // Once per win, not on every re-render
   useEffect(() => {
@@ -47,17 +56,19 @@ function GameOver() {
         <Link
           to={vsComputer?.playAgainPath ?? `/live-game/setup`}
           onClick={resetGame}
+          data-shortcut="play-again"
           className="text-center sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc]"
         >
-          {vsComputer?.playAgainLabel ?? "Play Again"}
+          {vsComputer?.playAgainLabel ?? "Play Again"} <Kbd className="ml-2 align-middle">N</Kbd>
         </Link>
 
         <Link
           to={`/`}
           onClick={resetGame}
+          data-shortcut="home"
           className="text-center sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 -skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc]"
         >
-          Home
+          Home <Kbd className="ml-2 align-middle">H</Kbd>
         </Link>
        <a href="https://forms.gle/skt5UKYGbDVzu2EL9" className="text-[#ffffff] underline text-center hover:text-[#d30cbc]" target="blank">feedback</a>
       </section>

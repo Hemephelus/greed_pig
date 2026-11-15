@@ -2,6 +2,8 @@
 import { useEffect, useRef } from "react";
 import { POWERUP_TYPES } from "src/constants/game";
 import { POWERUP_INFO } from "src/constants/powerups";
+import { SHORTCUTS } from "src/constants/shortcuts";
+import { useGameShortcuts } from "src/hooks/useGameShortcuts";
 
 // Muddy Trotters needs a target. Lists every other player; anyone already
 // carrying muddy trotters is shown but disabled, so you can see why.
@@ -9,14 +11,15 @@ export default function TargetPickerDialog({ targets, onPick, onCancel }) {
   const panelRef = useRef(null);
   const info = POWERUP_INFO[POWERUP_TYPES.MUDDY_TROTTERS];
 
-  // Esc closes. K2 may also handle Esc in the shortcuts hook; both just close.
-  useEffect(() => {
-    function onKeyDown(event) {
-      if (event.key === "Escape") onCancel();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onCancel]);
+  // K2: 1-7 pick the player with that number (same as clicking their button,
+  // so an already-muddy player can't be picked), Esc cancels.
+  useGameShortcuts(SHORTCUTS.targetPicker, {
+    pickTarget: (shortcut) => {
+      const player = targets[shortcut.value];
+      if (player && !player.halve_next_bank) onPick(player.player_index);
+    },
+    cancel: onCancel,
+  });
 
   // Move focus into the dialog so a keyboard user isn't left behind the overlay
   useEffect(() => {

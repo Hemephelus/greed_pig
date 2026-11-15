@@ -113,6 +113,7 @@ export default function PowerUpTray({ locked = false, onOpenChange, variant = "s
               key={powerup.id}
               type="button"
               onClick={() => handleClick(powerup)}
+              data-shortcut={`powerup-${index + 1}`}
               disabled={Boolean(reason)}
               title={reason ?? info.description}
               className={`bg-[#ffffff10] border border-[#FFFFFF40] rounded-lg duration-300 text-white hover:border-[#ffffff80] hover:bg-[#ffffff20] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-[#FFFFFF40] disabled:hover:bg-[#ffffff10] ${

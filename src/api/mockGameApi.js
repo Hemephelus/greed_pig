@@ -294,14 +294,162 @@ export async function bank({ gameId, playerIndex }) {
   });
 }
 
-// Step 3 of PF1 replaces this stub with the real power-up rules.
-export async function applyPowerup() {
+// POST /game/powerup/use (guide: POWERUPS_AND_KEYBOARD.md sections 2.4, 2.7 and 3.2/3.3).
+// Order of checks matches the real server, so a refused power-up is never used up.
+export async function applyPowerup({ gameId, playerIndex, powerupId, targetIndex }) {
   await wait();
-  fail(501, "NOT_IMPLEMENTED", "Power-ups are not available in the mock server yet.");
+  const room = getRoom(gameId);
+
+  if (!Number.isInteger(playerIndex) || playerIndex < 0 || playerIndex >= room.players.length) {
+    fail(400, ERROR_CODES.INVALID_INPUT, "player_index must be a valid seat number.");
+  }
+  if (!Number.isInteger(powerupId) || powerupId < 1) {
+    fail(400, ERROR_CODES.INVALID_INPUT, "powerup_id must be a whole number.");
+  }
+  checkTurn(room, playerIndex);
+
+  if (room.session.powerup_used_this_turn) {
+    fail(409, ERROR_CODES.POWERUP_NOT_ALLOWED, "You've already used a power-up this turn.");
+  }
+
+  const player = room.players[playerIndex];
+  const powerup = player.powerups.find((p) => p.id === powerupId);
+  if (!powerup) {
+    fail(404, ERROR_CODES.POWERUP_NOT_FOUND, "You don't have that power-up.");
+  }
+
+  // Muddy Trotters needs a real target that is not yourself.
+  let target = null;
+  if (powerup.type === POWERUP_TYPES.MUDDY_TROTTERS) {
+    if (
+      !Number.isInteger(targetIndex) ||
+      targetIndex < 0 ||
+      targetIndex >= room.players.length ||
+      targetIndex === playerIndex
+    ) {
+      fail(400, ERROR_CODES.INVALID_INPUT, "Pick another player as the target.");
+    }
+    target = room.players[targetIndex];
+  }
+
+  // "Not allowed" rules (2.4). Checked BEFORE the power-up is used up.
+  if (powerup.type === POWERUP_TYPES.PIGGY_BANK && player.turn_score < 2) {
+    fail(409, ERROR_CODES.POWERUP_NOT_ALLOWED, "Nothing to bank yet: you need at least 2 turn points.");
+  }
+  if (powerup.type === POWERUP_TYPES.MUD_BATH && player.mud_bath_active) {
+    fail(409, ERROR_CODES.POWERUP_NOT_ALLOWED, "You already have Mud Bath active.");
+  }
+  if (powerup.type === POWERUP_TYPES.MUDDY_TROTTERS && target.halve_next_bank) {
+    fail(409, ERROR_CODES.POWERUP_NOT_ALLOWED, `${target.name}'s trotters are already muddy.`);
+  }
+
+  // Use it up straight away (even if the effect comes later).
+  player.powerups = player.powerups.filter((p) => p.id !== powerupId);
+  room.session.powerup_used_this_turn = true;
+
+  let message;
+  let nextRollIsOne = null;
+  let gameWon = false;
+
+  switch (powerup.type) {
+    case POWERUP_TYPES.TRUFFLE_SNIFF: {
+      const next = rollDie();
+      room.session.next_die = next; // secret: only next_roll_is_one is ever sent
+      nextRollIsOne = next === BUST_FACE;
+      message = nextRollIsOne
+        ? `${player.name} sniffs for truffles... uh-oh, the next roll is a ${BUST_FACE}!`
+        : `${player.name} sniffs for truffles... the next roll is safe!`;
+      break;
+    }
+    case POWERUP_TYPES.PIGGY_BANK: {
+      const moved = Math.floor(player.turn_score / 2);
+      player.total_score += moved;
+      player.turn_score -= moved;
+      message = `${player.name} used Piggy Bank: banked ${moved} points, still rolling with ${player.turn_score}. Total score: ${player.total_score}`;
+      if (player.total_score >= room.session.winning_target) {
+        gameWon = true;
+        room.session.status = GAME_STATUS.WON;
+        message += ` ${player.name} wins the game!`;
+      }
+      break;
+    }
+    case POWERUP_TYPES.MUD_BATH: {
+      player.mud_bath_active = true;
+      message = `${player.name} jumps in the mud! The next bust keeps half the turn score.`;
+      break;
+    }
+    case POWERUP_TYPES.MUDDY_TROTTERS: {
+      target.halve_next_bank = true;
+      message = `${player.name} muddied ${target.name}'s trotters! Their next bank only counts half.`;
+      break;
+    }
+    default:
+      fail(400, ERROR_CODES.INVALID_INPUT, "Unknown power-up type.");
+  }
+  saveDb(db);
+
+  return copy({
+    success: true,
+    used: {
+      id: powerup.id,
+      type: powerup.type,
+      target_index: powerup.type === POWERUP_TYPES.MUDDY_TROTTERS ? targetIndex : null,
+    },
+    next_roll_is_one: nextRollIsOne,
+    game_won: gameWon,
+    winner: gameWon ? player : null,
+    message,
+    active_player_index: room.session.active_player_index,
+    powerup_used_this_turn: room.session.powerup_used_this_turn,
+    players: room.players,
+  });
 }
 
 // Handy in tests / the browser console: wipes every mock game.
 export function resetMockDb() {
   Object.keys(db).forEach((k) => delete db[k]);
   saveDb(db);
+}
+
+// ---------- mock-only test helpers (the real server has test routes instead) ----------
+
+// Gives a player an AVAILABLE power-up. Returns { id, type }.
+export function mockGivePowerup(gameId, playerIndex, type) {
+  const room = getRoom(gameId);
+  const player = room.players[playerIndex];
+  if (!player) throw new Error(`No player at index ${playerIndex}.`);
+  if (!Object.values(POWERUP_TYPES).includes(type)) {
+    throw new Error(`Unknown power-up type: ${type}`);
+  }
+  if (player.powerups.length >= MAX_POWERUPS_HELD) {
+    throw new Error(`${player.name} already holds ${MAX_POWERUPS_HELD} power-ups.`);
+  }
+  const powerup = grantPowerup(player, type);
+  saveDb(db);
+  return copy(powerup);
+}
+
+// Makes the NEXT roll exactly `value` (like Truffle Sniff does, but without a power-up).
+export function mockSetNextDie(gameId, value) {
+  const room = getRoom(gameId);
+  if (!Number.isInteger(value) || value < 1 || value > DIE_FACES) {
+    throw new Error(`value must be a whole number from 1 to ${DIE_FACES}.`);
+  }
+  room.session.next_die = value;
+  saveDb(db);
+}
+
+// Dev only: lets you test from the browser console, e.g.
+//   const g = await greedyMock.createGame({ playerNames: ["Ada", "Ben"], winningTarget: 100 })
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  window.greedyMock = {
+    createGame,
+    getGame,
+    roll,
+    bank,
+    applyPowerup,
+    mockGivePowerup,
+    mockSetNextDie,
+    resetMockDb,
+  };
 }

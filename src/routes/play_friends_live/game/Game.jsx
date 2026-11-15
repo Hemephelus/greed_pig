@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Navbar from "src/components/Navbar";
 import ErrorBanner from "src/components/ErrorBanner";
 import { ERROR_CODES } from "src/constants/game";
 import { useGameSession, PHASE } from "src/context/GameSessionContext";
+import { useGreedyPigContext } from "src/context/useGreedyPigContext";
+import { SHORTCUTS } from "src/constants/shortcuts";
+import { useGameShortcuts, pressShortcutButton } from "src/hooks/useGameShortcuts";
+import ShortcutHelp from "src/components/ShortcutHelp";
 import { useComputerOpponent } from "src/computer";
 import ComputerStatus from "src/computer/ui/ComputerStatus";
 import ComputerTurnRecap from "src/computer/ui/ComputerTurnRecap";
@@ -22,6 +26,22 @@ export default function LiveGame() {
   // Plays the computer's turns. Must run once here, before the early returns below,
   // because React needs hooks to be called in the same order on every render.
   const computer = useComputerOpponent();
+  
+  // Keyboard shortcuts (K1). R and B press the real Roll / PASS buttons, so a key
+  // can never do more than a click: a disabled button (busy, computer's turn,
+  // game over) ignores it. Game keys pause while the help overlay is open.
+  const { setHasSound } = useGreedyPigContext();
+  const [helpOpen, setHelpOpen] = useState(false);
+  useGameShortcuts(
+    SHORTCUTS.game,
+    {
+      roll: () => pressShortcutButton("roll"),
+      bank: () => pressShortcutButton("bank"),
+      toggleSound: () => setHasSound((on) => !on),
+      toggleHelp: () => setHelpOpen((open) => !open),
+    },
+    { enabled: phase === PHASE.PLAYING && !helpOpen }
+  );
 
   // Load the game named in the URL (first visit, refresh, or a different game ID)
   useEffect(() => {
@@ -90,6 +110,11 @@ export default function LiveGame() {
       <StatsSection players={players} activePlayer={activePlayer} />
       <StatsSectionMobile players={players} activePlayer={activePlayer} />
       {phase === PHASE.WON ? <GameOver /> : null}
+      <ShortcutHelp
+        open={helpOpen}
+        onOpen={() => setHelpOpen(true)}
+        onClose={() => setHelpOpen(false)}
+      />
     </div>
   );
 }

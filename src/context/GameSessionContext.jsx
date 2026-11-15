@@ -5,7 +5,8 @@
 // Computer opponents: call useComputerOpponent() (src/computer) on the game screen.
 //
 //   const { players, activePlayer, session, phase, isBusy, error,
-//           startGame, loadGame, roll, bank, clearError, resetGame } = useGameSession();
+//           startGame, loadGame, roll, bank, activatePowerup,
+//           clearError, resetGame } = useGameSession();
 //
 // Every action calls the backend (or the mock) through src/api and stores the
 // response. Components never compute scores themselves.
@@ -21,8 +22,19 @@ import {
   gameSessionReducer,
   initialGameState,
 } from "src/state/gameSessionReducer";
-import { getActivePlayer, getLeaderboard } from "src/state/selectors";
-import { clearCurrentGame, loadCurrentGame, saveCurrentGame } from "src/utils/gameStorage";
+import {
+  getActivePlayer,
+  getLeaderboard,
+  getUsablePowerups,
+} from "src/state/selectors";
+import {
+  clearCurrentGame,
+  clearSniff,
+  loadCurrentGame,
+  loadSniff,
+  saveCurrentGame,
+  saveSniff,
+} from "src/utils/gameStorage";
 import { validateSetup } from "src/utils/validation";
 
 const GameSessionContext = createContext(null);
@@ -42,16 +54,16 @@ export function GameSessionProvider({ children }) {
 
   // ---------- internal helpers ----------
 
-  const fetchGame = useCallback(async (gameId, avatars, computers) => {
+  const fetchGame = useCallback(async (gameId, avatars, computers, sniff) => {
     const response = await api.getGame(gameId);
-    dispatch({ type: ACTIONS.GAME_LOADED, response, avatars, computers });
+    dispatch({ type: ACTIONS.GAME_LOADED, response, avatars, computers, sniff });
     return response;
   }, []);
 
   const handleError = useCallback(
     async (err) => {
       dispatch({ type: ACTIONS.REQUEST_FAILED, error: err });
-      // Screen is out of date (e.g. NOT_YOUR_TURN): reload from the server
+      // Screen is out of date (e.g. NOT_YOUR_TURN, POWERUP_NOT_FOUND): reload from the server
       const { gameId } = stateRef.current;
       if (gameId && RESYNC_CODES.includes(err.code)) {
         try {
@@ -103,7 +115,7 @@ export function GameSessionProvider({ children }) {
       const computers = same ? saved.computers ?? {} : {};
       dispatch({ type: ACTIONS.REQUEST_STARTED, loading: true });
       try {
-        await fetchGame(gameId, avatars, computers);
+        await fetchGame(gameId, avatars, computers, loadSniff());
         return true;
       } catch (err) {
         await handleError(err);
@@ -131,6 +143,7 @@ export function GameSessionProvider({ children }) {
         playerIndex: session.active_player_index,
       });
       dispatch({ type: ACTIONS.ROLL_RESOLVED, response });
+      clearSniff(); // a roll uses up the sniffed die
       return response;
     } catch (err) {
       await handleError(err);
@@ -151,12 +164,47 @@ export function GameSessionProvider({ children }) {
         playerIndex: session.active_player_index,
       });
       dispatch({ type: ACTIONS.BANK_RESOLVED, response });
+      clearSniff(); // banking throws the sniffed die away
       return response;
     } catch (err) {
       await handleError(err);
       return null;
     }
   }, [handleError]);
+
+  // POST /game/powerup/use for the active player. Returns the response or null.
+  // targetIndex is only needed for MUDDY_TROTTERS.
+  // (Named activatePowerup, not usePowerup: ESLint would treat "use…" as a React hook.)
+  const activatePowerup = useCallback(
+    async ({ powerupId, targetIndex, byComputer = false } = {}) => {
+      const { session, isBusy, phase, computers } = stateRef.current;
+      if (!session || isBusy || phase !== PHASE.PLAYING) return null;
+      if (session.active_player_index in computers && byComputer !== true) return null;
+
+      dispatch({ type: ACTIONS.REQUEST_STARTED });
+      try {
+        const response = await api.applyPowerup({
+          gameId: session.id,
+          playerIndex: session.active_player_index,
+          powerupId,
+          targetIndex,
+        });
+        dispatch({ type: ACTIONS.POWERUP_RESOLVED, response });
+        if (response.next_roll_is_one !== null && response.next_roll_is_one !== undefined) {
+          saveSniff({
+            gameId: session.id,
+            activePlayerIndex: session.active_player_index,
+            nextRollIsOne: response.next_roll_is_one,
+          });
+        }
+        return response;
+      } catch (err) {
+        await handleError(err);
+        return null;
+      }
+    },
+    [handleError]
+  );
 
   const clearError = useCallback(() => dispatch({ type: ACTIONS.ERROR_CLEARED }), []);
 
@@ -181,19 +229,25 @@ export function GameSessionProvider({ children }) {
     [state.players, state.avatars, state.computers, state.session, pigImages]
   );
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    const activePlayer = getActivePlayer(players, state.session);
+    return {
       // raw state
       phase: state.phase,
       gameId: state.gameId,
       session: state.session,
       lastRoll: state.lastRoll,
+      lastBank: state.lastBank,
+      lastPowerupEarned: state.lastPowerupEarned,
+      lastPowerupUsed: state.lastPowerupUsed,
+      sniffResult: state.sniffResult,
       message: state.message,
       isBusy: state.isBusy,
       error: state.error,
       // UI-ready
       players,
-      activePlayer: getActivePlayer(players, state.session),
+      activePlayer,
+      usablePowerups: getUsablePowerups(activePlayer, state.session),
       leaderboard: getLeaderboard(players),
       winner: getWinner(state.winner, players),
       savedGame: loadCurrentGame(),
@@ -202,11 +256,11 @@ export function GameSessionProvider({ children }) {
       loadGame,
       roll,
       bank,
+      activatePowerup,
       clearError,
       resetGame,
-    }),
-    [state, players, startGame, loadGame, roll, bank, clearError, resetGame]
-  );
+    };
+  }, [state, players, startGame, loadGame, roll, bank, activatePowerup, clearError, resetGame]);
 
   return <GameSessionContext.Provider value={value}>{children}</GameSessionContext.Provider>;
 }

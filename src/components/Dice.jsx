@@ -129,6 +129,13 @@ export function Dice({
   // Fade only when the die can't be used for a reason other than "rolling now"
   const isFaded = !isRolling && isDisabled;
   const isBust = Boolean(lastRoll?.bust);
+    // Mud Bath turned the bust into a half-save: show mud instead of plain red
+  const mudSaved = isBust ? lastRoll?.mud_bath_saved ?? 0 : 0;
+  const messageColor = mudSaved
+    ? "text-[#d6a06a]"
+    : isBust
+    ? "text-[#E71D36]"
+    : "text-[#F9F7E8]";
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -149,10 +156,17 @@ export function Dice({
           />
         ))}
       </button>
+            {!isRolling && mudSaved ? (
+        <span
+          className="sec-font animate-pulse rounded-full border border-[#8b5a2ba0] bg-[#8b5a2b30] px-3 py-1 text-xs font-bold text-[#d6a06a]"
+          title="Mud Bath kept half the turn score"
+          data-testid="mud-saved"
+        >
+          🟤 Mud Bath saved {mudSaved}
+        </span>
+      ) : null}
       <p
-        className={`sec-font text-center text-sm lg:text-base min-h-[2.5rem] ${
-          isBust ? "text-[#E71D36]" : "text-[#F9F7E8]"
-        }`}
+        className={`sec-font text-center text-sm lg:text-base min-h-[2.5rem] ${messageColor}`}
       >
         {!isRolling && message ? message : ""}
       </p>

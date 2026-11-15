@@ -8,7 +8,7 @@ import addPlayerSound from "src/sound_effect/add_player.mp3";
 import useAudio from "src/hooks/useAudio";
 import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
 import PowerUpTray from "src/components/powerups/PowerUpTray";
-
+import PowerUpFeedback from "src/components/powerups/PowerUpFeedback";
 
 function DiceSectionMobile({ locked = false }) {
   const { setChangeBackground } = useLiveGameContext();
@@ -59,6 +59,7 @@ function DiceSectionMobile({ locked = false }) {
           locked={locked}
         />
         <PowerUpTray locked={locked} variant="row" />
+        <PowerUpFeedback />
 
         <Menu />
         <div className="text-white flex justify-between w-full">

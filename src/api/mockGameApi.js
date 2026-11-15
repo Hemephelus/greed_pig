@@ -6,6 +6,8 @@
 // VITE_USE_MOCK_API=false and nothing else has to change.
 //
 // Games are saved in localStorage, so a page refresh keeps the game (test T2 with it).
+//
+// Power-up rules: POWERUPS_AND_KEYBOARD.md section 2 (the mock must behave like the server).
 
 import { ApiError } from "./gameApi";
 import {
@@ -18,7 +20,13 @@ import {
   MAX_TARGET,
   MIN_PLAYERS,
   MIN_TARGET,
+  POWERUP_TYPES,
 } from "src/constants/game";
+import {
+  MAX_POWERUPS_HELD,
+  POWERUP_EARN_MIN_LOST,
+  POWERUP_INFO,
+} from "src/constants/powerups";
 
 const STORAGE_KEY = "greedy-pig:mock-games";
 const LATENCY_MS = 200;
@@ -43,6 +51,11 @@ function saveDb(db) {
 const db = loadDb();
 let nextPlayerId =
   Object.values(db).flatMap((g) => g.players).reduce((max, p) => Math.max(max, p.id), 0) + 1;
+let nextPowerupId =
+  Object.values(db)
+    .flatMap((g) => g.players)
+    .flatMap((p) => p.powerups ?? [])
+    .reduce((max, pu) => Math.max(max, pu.id), 0) + 1;
 
 // ---------- helpers ----------
 
@@ -76,6 +89,34 @@ function nextIndex(room) {
   return (room.session.active_player_index + 1) % room.players.length;
 }
 
+// Turn passing (guide 2.5): ONE update that moves to the next seat,
+// resets "power-up used this turn" and throws away any Truffle Sniff roll.
+function advanceTurn(room) {
+  room.session.active_player_index = nextIndex(room);
+  room.session.powerup_used_this_turn = false;
+  room.session.next_die = null;
+  return room.players[room.session.active_player_index];
+}
+
+// next_die is a secret: it must never leave the "server" (the mock).
+function publicSession(session) {
+  // eslint-disable-next-line no-unused-vars
+  const { next_die, ...rest } = session;
+  return rest;
+}
+
+// Adds an AVAILABLE power-up to a player's tray and returns it.
+function grantPowerup(player, type) {
+  const powerup = { id: nextPowerupId++, type };
+  player.powerups.push(powerup);
+  return powerup;
+}
+
+function randomPowerupType() {
+  const types = Object.values(POWERUP_TYPES);
+  return types[Math.floor(Math.random() * types.length)];
+}
+
 // Same shape as Backend/src/utils/formatPlayer.js
 function makePlayer(gameId, name, index) {
   return {
@@ -85,9 +126,8 @@ function makePlayer(gameId, name, index) {
     name,
     total_score: 0,
     turn_score: 0,
-    shield_active: false,
-    double_active: false,
-    skip_next_turn: false,
+    mud_bath_active: false,
+    halve_next_bank: false,
     powerups: [],
   };
 }
@@ -120,6 +160,8 @@ export async function createGame({ playerNames, winningTarget }) {
       status: GAME_STATUS.IN_PROGRESS,
       winning_target: winningTarget,
       active_player_index: 0,
+      powerup_used_this_turn: false,
+      next_die: null, // private: set by Truffle Sniff, never sent to the frontend
     },
     players: names.map((name, i) => makePlayer(gameId, name, i)),
   };
@@ -136,7 +178,7 @@ export async function createGame({ playerNames, winningTarget }) {
 export async function getGame(gameId) {
   await wait();
   const room = getRoom(gameId);
-  return copy({ success: true, session: room.session, players: room.players });
+  return copy({ success: true, session: publicSession(room.session), players: room.players });
 }
 
 export async function roll({ gameId, playerIndex }) {
@@ -145,15 +187,44 @@ export async function roll({ gameId, playerIndex }) {
   checkTurn(room, playerIndex);
 
   const player = room.players[playerIndex];
-  const dice = rollDie(); // ONE die
+  // A saved Truffle Sniff roll is used first, then cleared.
+  const dice = room.session.next_die ?? rollDie(); // ONE die
+  room.session.next_die = null;
   const bust = dice === BUST_FACE;
+
   let message;
+  let mudBathSaved = 0;
+  let powerupEarned = null;
+  let gameWon = false;
 
   if (bust) {
+    const lost = player.turn_score;
+    mudBathSaved = player.mud_bath_active ? Math.floor(lost / 2) : 0;
     player.turn_score = 0;
-    room.session.active_player_index = nextIndex(room);
-    const next = room.players[room.session.active_player_index];
-    message = `${player.name} rolled a ${BUST_FACE}. Bust! It's ${next.name}'s turn.`;
+    player.total_score += mudBathSaved;
+    player.mud_bath_active = false; // Mud Bath is used up by the bust
+
+    message = `${player.name} rolled a ${BUST_FACE}. Bust!`;
+    if (mudBathSaved > 0) message += ` Mud Bath saved ${mudBathSaved} points.`;
+
+    if (player.total_score >= room.session.winning_target) {
+      // Mud Bath's saved points reached the target: the game ends, the turn does not pass.
+      gameWon = true;
+      room.session.status = GAME_STATUS.WON;
+      message += ` ${player.name} wins the game!`;
+    } else {
+      // Comeback rule: uses the turn score from before the bust.
+      if (lost >= POWERUP_EARN_MIN_LOST) {
+        if (player.powerups.length < MAX_POWERUPS_HELD) {
+          powerupEarned = grantPowerup(player, randomPowerupType());
+          message += ` Comeback: earned a ${POWERUP_INFO[powerupEarned.type].label}!`;
+        } else {
+          message += " Power-up slots are full.";
+        }
+      }
+      const next = advanceTurn(room);
+      message += ` It's ${next.name}'s turn.`;
+    }
   } else {
     player.turn_score += dice;
     message = `${player.name} rolled a ${dice}. Current turn total: ${player.turn_score}`;
@@ -164,6 +235,10 @@ export async function roll({ gameId, playerIndex }) {
     success: true,
     dice, // a single number 1–6 (see "Roll response" in INTEGRATION_TASKS.md)
     bust,
+    mud_bath_saved: mudBathSaved,
+    powerup_earned: powerupEarned,
+    game_won: gameWon,
+    winner: gameWon ? player : null,
     message,
     active_player_index: room.session.active_player_index,
     players: room.players,
@@ -176,17 +251,34 @@ export async function bank({ gameId, playerIndex }) {
   checkTurn(room, playerIndex);
 
   const player = room.players[playerIndex];
-  const banked = player.turn_score;
-  player.total_score += banked;
+  const turnScore = player.turn_score;
+
+  // Muddy Trotters: only half counts (rounded down), then the flag clears.
+  let added = turnScore;
+  let halved = false;
+  let lostToMud = 0;
+  if (player.halve_next_bank) {
+    added = Math.floor(turnScore / 2);
+    lostToMud = turnScore - added;
+    halved = true;
+    player.halve_next_bank = false;
+  }
+
+  player.total_score += added;
   player.turn_score = 0;
 
+  // The win check happens AFTER halving.
   const gameWon = player.total_score >= room.session.winning_target;
   if (gameWon) {
     room.session.status = GAME_STATUS.WON;
   } else {
-    room.session.active_player_index = nextIndex(room);
+    advanceTurn(room);
   }
   saveDb(db);
+
+  const message = halved
+    ? `${player.name}'s trotters are muddy! Banked ${added} of ${turnScore} points. Total score: ${player.total_score}`
+    : `${player.name} banked ${added} points! Total score: ${player.total_score}`;
 
   return copy({
     success: true,
@@ -194,12 +286,15 @@ export async function bank({ gameId, playerIndex }) {
     // The guide only shows `winner: null`. The mock sends the player object;
     // getWinner() in src/mappers/gameMappers.js accepts object, index or name.
     winner: gameWon ? player : null,
-    message: `${player.name} banked ${banked} points! Total score: ${player.total_score}`,
+    halved,
+    lost_to_mud: lostToMud,
+    message,
     active_player_index: room.session.active_player_index,
     players: room.players,
   });
 }
 
+// Step 3 of PF1 replaces this stub with the real power-up rules.
 export async function applyPowerup() {
   await wait();
   fail(501, "NOT_IMPLEMENTED", "Power-ups are not available in the mock server yet.");

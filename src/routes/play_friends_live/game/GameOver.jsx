@@ -6,7 +6,7 @@ import celebrationSound from "src/sound_effect/celebration.mp3";
 import useAudio from "src/hooks/useAudio";
 import { useVsComputerResult } from "src/computer/ui/useVsComputerResult";
 
-function GameOver({ setIsContinue }) {
+function GameOver() {
   const { winner, leaderboard, resetGame } = useGameSession();
   const windowWidth = useRef(window.innerWidth);
   const windowHeight = useRef(window.innerHeight);
@@ -20,10 +20,6 @@ function GameOver({ setIsContinue }) {
   const vsComputer = useVsComputerResult(champion);
   // No party when the computer beats you
   const celebrate = vsComputer?.celebrate ?? true;
-
-  useEffect(() => {
-    setIsContinue(false)
-  }, [])
 
   // Once per win, not on every re-render
   useEffect(() => {

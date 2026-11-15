@@ -18,16 +18,16 @@ function LiveGameSetup() {
     setMaxPoints,
     setPlayerData,
     setDiceValue,
-    isContinue,
   } = useLiveGameContext();
-  const { startGame, isBusy, clearError } = useGameSession();
+  const { startGame, isBusy, clearError, savedGame } = useGameSession();
   const navigate = useNavigate();
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter((pig) => pig.includes("pig"));
 
   async function setupPlayers(resume) {
     if (resume) {
-      navigate("/live-game/game");
+      // Open the game saved on this device; Game.jsx loads it from the server.
+      if (savedGame?.gameId) navigate(`/live-game/game/${savedGame.gameId}`);
       return;
     }
 
@@ -91,7 +91,7 @@ function LiveGameSetup() {
             <SoundSwitch />
           </div>
           <section className="flex gap-4 flex-wrap justify-center">
-            {isContinue ? (
+            {savedGame?.gameId ? (
               <>
                 <button
                   onClick={() => {setupPlayers(false)}}

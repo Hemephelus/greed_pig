@@ -23,12 +23,13 @@ export const GAME_STATUS = Object.freeze({
   WON: "WON",
 });
 
-// player_powerups.type (not used by the UI yet; see INTEGRATION_TASKS.md T10)
+// player_powerups.type (the "Muddy Pig" set, see POWERUPS_AND_KEYBOARD.md section 2).
+// Labels and icons live in src/constants/powerups.js.
 export const POWERUP_TYPES = Object.freeze({
-  SHIELD: "SHIELD",
-  DOUBLE_UP: "DOUBLE_UP",
-  FREEZE: "FREEZE",
-  STEAL: "STEAL",
+  TRUFFLE_SNIFF: "TRUFFLE_SNIFF",
+  PIGGY_BANK: "PIGGY_BANK",
+  MUD_BATH: "MUD_BATH",
+  MUDDY_TROTTERS: "MUDDY_TROTTERS",
 });
 
 // Error codes the frontend reacts to. The backend should send these in
@@ -40,6 +41,7 @@ export const ERROR_CODES = Object.freeze({
   NOT_YOUR_TURN: "NOT_YOUR_TURN",
   GAME_OVER: "GAME_OVER",
   POWERUP_NOT_FOUND: "POWERUP_NOT_FOUND",
+  POWERUP_NOT_ALLOWED: "POWERUP_NOT_ALLOWED",
   NETWORK_ERROR: "NETWORK_ERROR",
   CONFIG_ERROR: "CONFIG_ERROR",
   BAD_RESPONSE: "BAD_RESPONSE",

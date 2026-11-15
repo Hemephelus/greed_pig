@@ -11,6 +11,11 @@ import {
   MAX_TARGET,
   DEFAULT_TARGET,
 } from "src/constants/game";
+import {
+  MAX_POWERUPS_HELD,
+  POWERUP_EARN_MIN_LOST,
+  POWERUP_INFO,
+} from "src/constants/powerups";
 
 export default function HowToPlay() {
 
@@ -83,6 +88,37 @@ export default function HowToPlay() {
           <p >
           The first player to <b>pass</b> and reach the max score (default <b>{DEFAULT_TARGET}</b>) or more wins.
           </p>
+          </section>
+        </section>
+
+        <section className="text-white space-y-4">
+          <h1 className="pri-font text-2xl lg:text-4xl">POWER-UPS</h1>
+          <section className=" backdrop:blur bg-[#ffffff10] px-8 lg:px-12 py-6 border text-base lg:text-xl rounded-lg">
+            <p className="mb-4">
+              <b>Comeback rule:</b> if you bust (roll a <b>1</b>) while your turn score is{" "}
+              <b>{POWERUP_EARN_MIN_LOST} or more</b>, you earn a random power-up. You can use
+              it from your next turn.
+            </p>
+            <ul className="list-disc pl-6 mb-4 space-y-1">
+              <li>You can hold up to <b>{MAX_POWERUPS_HELD}</b> power-ups. With all slots full, a bust earns nothing.</li>
+              <li>Use <b>1 per turn</b>, on your own turn, before you bank or bust. Using one doesn&apos;t end your turn.</li>
+              <li>Your power-ups appear in the tray under the die. Click one to use it.</li>
+            </ul>
+            <ul className="space-y-3">
+              {Object.entries(POWERUP_INFO).map(([type, info]) => (
+                <li
+                  key={type}
+                  className="border border-[#ffffff40] bg-[#ffffff10] rounded-lg p-3"
+                >
+                  <b className="text-[#FFD700]">
+                    <span aria-hidden="true">{info.icon}</span> {info.label}
+                  </b>{" "}
+                  <span className="text-[#F17E8C]">({info.shortText})</span>
+                  <br />
+                  {info.description}
+                </li>
+              ))}
+            </ul>
           </section>
         </section>
 

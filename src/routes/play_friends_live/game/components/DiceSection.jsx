@@ -8,6 +8,7 @@ import addPlayerSound from "src/sound_effect/add_player.mp3";
 import useAudio from "src/hooks/useAudio";
 import ComputerTurnLock from "src/computer/ui/ComputerTurnLock";
 import PowerUpTray from "src/components/powerups/PowerUpTray";
+import Kbd from "src/components/Kbd";
 
 function DiceSection({ locked = false }) {
   const { setChangeBackground } = useLiveGameContext();
@@ -53,9 +54,11 @@ function DiceSection({ locked = false }) {
         type="button"
         className="bg-[#056FA4c0] w-full  text-white text-center text-base lg:text-xl xl:text-2xl font-semibold py-2 lg:py-4 rounded-lg border hover:scale-105 active:scale-100 duration-300 disabled:opacity-50 disabled:hover:scale-100"
         onClick={handlePassClick}
+        data-shortcut="bank"
         disabled={isDisabled}
       >
-        PASS
+        
+        PASS <Kbd className="ml-2 align-middle">B</Kbd>
       </button>
       <div className="text-white grid place-content-center gap-2 bg-[#ffffff10] w-full p-4 rounded-lg border border-[#ffffff40]">
         <p className="text-center text-sm lg:text-lg">

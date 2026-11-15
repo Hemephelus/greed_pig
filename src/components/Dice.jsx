@@ -8,6 +8,7 @@ import diceRollSound from "src/sound_effect/dice_roll.mp3";
 import loseSound from "src/sound_effect/lose_sound.mp3";
 import useAudio from "src/hooks/useAudio";
 import { registerDice } from "src/computer/ui/diceAnimator";
+import Kbd from "src/components/Kbd";
 
 const SHUFFLE_TICKS = 30;
 const TICK_MS = 100;
@@ -134,7 +135,10 @@ export function Dice({
     <div className="flex flex-col items-center gap-2">
       <button
         ref={buttonRef}
-        className={`hover:scale-105 active:scale-100 disabled:hover:scale-100 duration-300 md:w-auto w-[200px] ${
+        data-shortcut="roll"
+        title="Roll (R)"
+        className={`relative hover:scale-105 active:scale-100 disabled:hover:scale-100 duration-300 md:w-auto w-[200px]
+          ${
           isFaded ? "opacity-50" : ""
         }`}
         onClick={handleDiceClick}
@@ -148,6 +152,7 @@ export function Dice({
             className={`${currentDice === index ? "" : "hidden"}`}
           />
         ))}
+        <Kbd className="absolute top-2 right-2 !bg-[#00000080]">R</Kbd>
       </button>
       <p
         className={`sec-font text-center text-sm lg:text-base min-h-[2.5rem] ${

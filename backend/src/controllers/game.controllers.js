@@ -80,6 +80,7 @@ export async function getGame(req, res) {
       status: session.status,
       winning_target: session.winning_target,
       active_player_index: session.active_player_index,
+      powerup_used_this_turn: session.powerup_used_this_turn,
     },
     players: players.map((row) => formatPlayer(row, powerups)),
   });
@@ -332,6 +333,168 @@ export async function bankScore(req, res) {
     lost_to_mud: lostToMud,
     message,
     active_player_index: updated.session.active_player_index,
+    players: formattedPlayers,
+  });
+}
+
+export async function usePowerup(req, res) {
+  const { game_id, player_index } = validateTurnBody(req.body);
+  const { powerup_id, target_index } = req.body;
+
+  if (!Number.isInteger(powerup_id) || powerup_id < 1) {
+    throw new ApiError(400, "INVALID_INPUT", "powerup_id must be a whole number, 1 or more.");
+  }
+
+  const { session, players, powerups } = await loadRoom(game_id);
+  assertCanPlay(session, player_index);
+  const player = players.find((p) => p.player_index === player_index);
+
+  if (session.powerup_used_this_turn) {
+    throw new ApiError(409, "POWERUP_NOT_ALLOWED", "You've already used a power-up this turn.");
+  }
+
+  // The player must own this power-up, unused (loadRoom returns AVAILABLE ones only)
+  const powerup = powerups.find((p) => p.id === powerup_id && p.player_id === player.id);
+  if (!powerup) {
+    throw new ApiError(404, "POWERUP_NOT_FOUND", "You don't have that power-up.");
+  }
+
+  // Check the type's own rules BEFORE using it up, so a refused power-up isn't wasted
+  let target = null;
+  if (powerup.type === "MUDDY_TROTTERS") {
+    if (!Number.isInteger(target_index) || target_index < 0 || target_index >= players.length) {
+      throw new ApiError(400, "INVALID_INPUT", "Muddy Trotters needs a target_index: another player's seat.");
+    }
+
+    if (target_index === player_index) {
+      throw new ApiError(400, "INVALID_INPUT", "You can't muddy your own trotters.");
+    }
+
+    target = players.find((p) => p.player_index === target_index);
+    if (target.halve_next_bank) {
+      throw new ApiError(409, "POWERUP_NOT_ALLOWED", `${target.name}'s trotters are already muddy.`);
+    }
+  }
+
+  if (powerup.type === "PIGGY_BANK" && player.turn_score < 2) {
+    throw new ApiError(409, "POWERUP_NOT_ALLOWED", "Nothing to put in the Piggy Bank yet (you need at least 2 turn points).");
+  }
+
+  if (powerup.type === "MUD_BATH" && player.mud_bath_active) {
+    throw new ApiError(409, "POWERUP_NOT_ALLOWED", "You're already in the mud: your Mud Bath is still active.");
+  }
+
+  // Claim this turn's power-up slot. The extra .eq() makes double clicks safe:
+  //    only one request can flip it from false to true.
+  const { data: claimedTurn, error: claimError } = await supabase
+    .from("game_sessions")
+    .update({ powerup_used_this_turn: true })
+    .eq("id", game_id)
+    .eq("powerup_used_this_turn", false)
+    .select("id");
+  if (claimError) throw claimError;
+  if (claimedTurn.length === 0) {
+    throw new ApiError(409, "POWERUP_NOT_ALLOWED", "You've already used a power-up this turn.");
+  }
+
+  // Use up the power-up (again only if it's still AVAILABLE)
+  const { data: usedRows, error: useError } = await supabase
+    .from("player_powerups")
+    .update({ status: "USED", used_at: new Date().toISOString() })
+    .eq("id", powerup.id)
+    .eq("status", "AVAILABLE")
+    .select("id");
+  if (useError) throw useError;
+  if (usedRows.length === 0) {
+    // Someone used it a moment ago: give the turn's slot back
+    await supabase.from("game_sessions").update({ powerup_used_this_turn: false }).eq("id", game_id);
+    throw new ApiError(404, "POWERUP_NOT_FOUND", "That power-up was already used.");
+  }
+
+  // Apply powerup effect
+  let nextRollIsOne = null;
+  let gameWon = false;
+  let message;
+
+  switch (powerup.type) {
+    case "TRUFFLE_SNIFF": {
+      // Decide the next roll now; only say whether it's a 1 (the number stays secret)
+      const nextDie = crypto.randomInt(1, 7);
+      const { error } = await supabase.from("game_sessions").update({ next_die: nextDie }).eq("id", game_id);
+
+      if (error) throw error;
+
+      nextRollIsOne = nextDie === 1;
+
+      message = nextRollIsOne
+        ? `${player.name} sniffs for truffles... a 1 is coming!`
+        : `${player.name} sniffs for truffles... the next roll is safe!`;
+      break;
+    }
+    case "PIGGY_BANK": {
+      // Bank half the turn score now and keep rolling with the rest
+      const moved = Math.floor(player.turn_score / 2);
+      const newTotal = player.total_score + moved;
+      const newTurn = player.turn_score - moved;
+
+      const { error } = await supabase
+        .from("players")
+        .update({ total_score: newTotal, turn_score: newTurn })
+        .eq("id", player.id);
+
+      if (error) throw error;
+
+      gameWon = newTotal >= session.winning_target;
+
+      if (gameWon) {
+        const { error: wonError } = await supabase
+          .from("game_sessions")
+          .update({ status: "WON", next_die: null })
+          .eq("id", game_id);
+
+        if (wonError) throw wonError;
+
+        message = `${player.name} puts ${moved} points in the Piggy Bank and wins with ${newTotal}!`;
+      } else {
+        message = `${player.name} puts ${moved} points in the Piggy Bank! Total score: ${newTotal}. Still rolling with ${newTurn}.`;
+      }
+      break;
+    }
+
+    case "MUD_BATH": {
+      const { error } = await supabase.from("players").update({ mud_bath_active: true }).eq("id", player.id);
+
+      if (error) throw error;
+
+      message = `${player.name} takes a Mud Bath. Their next bust keeps half the points.`;
+      break;
+    }
+
+    case "MUDDY_TROTTERS": {
+      const { error } = await supabase.from("players").update({ halve_next_bank: true }).eq("id", target.id);
+
+      if (error) throw error;
+
+      message = `${player.name} muddied ${target.name}'s trotters! Their next bank only counts half.`;
+      break;
+    }
+
+    default:
+      throw new ApiError(500, "SERVER_ERROR", `Unknown power-up type ${powerup.type}.`);
+  }
+
+  const updated = await loadRoom(game_id);
+  const formattedPlayers = updated.players.map((row) => formatPlayer(row, updated.powerups));
+
+  res.json({
+    success: true,
+    used: { id: powerup.id, type: powerup.type, target_index: target ? target.player_index : null },
+    next_roll_is_one: nextRollIsOne,
+    game_won: gameWon,
+    winner: gameWon ? formattedPlayers.find((p) => p.player_index === player_index) : null,
+    message,
+    active_player_index: updated.session.active_player_index,
+    powerup_used_this_turn: updated.session.powerup_used_this_turn,
     players: formattedPlayers,
   });
 }

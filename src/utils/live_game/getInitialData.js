@@ -14,6 +14,9 @@ export function getInitialPlayerData(pigs, pigNames) {
       pig_index: i,
       running_points: 0,
       total_points: 0,
+      consecutiveRolls: 0,
+      shields: 0,
+      pendingShieldDecision: false,
     };
   }
   return arr;

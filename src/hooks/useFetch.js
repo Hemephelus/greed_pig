@@ -1,32 +1,3 @@
-import { useState } from "react";
-
-export function useFetch(url) {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    
-    async function getData() {
-      try {
-        const response = fetch(url);
-        if (!response.ok) {
-          throw new Error("Error with data");
-        }
-        let jsonData = await response.json();
-        setData(jsonData);
-        setIsLoading(false);
-      } catch (e) {
-        setError(e);
-        setIsLoading(false);
-      }
-    }
-
-    getData();
-  }, [url]);
-
-  return [data, isLoading, error];
-}
 
 import { useState, useEffect } from "react";
 
@@ -38,25 +9,26 @@ function useFetch(url) {
   useEffect(() => {
     const abortController = new AbortController();
 
+    setIsLoading(true);
+    setError(null);
+
     async function fetchData() {
       try {
         const response = await fetch(url, {
           method: "GET",
-          //   headers: {
-          //     'Content-Type': 'application/json'
-          //   },
           signal: abortController.signal,
         });
+
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        const data = await response.json();
-        setData(data);
+
+        const jsonData = await response.json();
+
+        setData(jsonData);
         setIsLoading(false);
       } catch (error) {
-        if (error.name === "AbortError") {
-          // Do nothing if request was aborted
-        } else {
+        if (error.name !== "AbortError") {
           setError(error);
           setIsLoading(false);
         }
@@ -74,3 +46,4 @@ function useFetch(url) {
 }
 
 export default useFetch;
+export { useFetch };

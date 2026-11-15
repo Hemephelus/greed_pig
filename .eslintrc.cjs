@@ -16,5 +16,14 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'react/prop-types': 'off',
+    'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
   },
+  overrides: [                                                   
+    {
+      files: ['server/**/*.js'],
+      env: { node: true, browser: false },
+    },
+  ],
 }
+

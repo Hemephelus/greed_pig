@@ -4,7 +4,6 @@ import Navbar from "src/components/Navbar";
 import ErrorBanner from "src/components/ErrorBanner";
 import { ERROR_CODES } from "src/constants/game";
 import { useGameSession, PHASE } from "src/context/GameSessionContext";
-import { useLiveGameContext } from "src/context/useLiveGameContext";
 import { useComputerOpponent } from "src/computer";
 import ComputerStatus from "src/computer/ui/ComputerStatus";
 import ComputerTurnRecap from "src/computer/ui/ComputerTurnRecap";
@@ -18,16 +17,11 @@ import DiceSectionMobile from "./components/DiceSectionMobile";
 
 export default function LiveGame() {
   const { gameId } = useParams();
-  const { setIsContinue } = useLiveGameContext();
-  const { phase, session, players, activePlayer, leaderboard, error, loadGame } =
+  const { phase, session, players, activePlayer, error, loadGame } =
     useGameSession();
-    // Plays the computer's turns. Must run once here, before the early returns below,
-    // because React needs hooks to be called in the same order on every render.
+  // Plays the computer's turns. Must run once here, before the early returns below,
+  // because React needs hooks to be called in the same order on every render.
   const computer = useComputerOpponent();
-
-  useEffect(() => {
-    setIsContinue(true);
-  }, [setIsContinue]);
 
   // Load the game named in the URL (first visit, refresh, or a different game ID)
   useEffect(() => {
@@ -80,11 +74,6 @@ export default function LiveGame() {
     );
   }
 
-  // NOTE: the old-named props (playerData, currentPlayer) are temporary so the
-  // screen doesn't crash before T3/T4/T5/T6 update the child components.
-  // Remove them as each child is migrated.
-  const oldPlayerIndex = activePlayer?.player_index ?? 0;
-
   return (
     <div className="md:grid md:grid-cols-[minmax(auto,_200px)_1fr_minmax(auto,_200px)] lg:grid-cols-[minmax(auto,_250px)_1fr_minmax(auto,_250px)] xl:grid-cols-[auto_1fr_minmax(auto,_300px)] relative">
       <DiceSection locked={computer.isComputerTurn} />
@@ -93,41 +82,14 @@ export default function LiveGame() {
         <ErrorBanner />
         <ComputerStatus computer={computer} />
         <ComputerTurnRecap computer={computer} />
-        <PlayerTable
-          players={players}
-          activePlayer={activePlayer}
-          playerData={players}
-          currentPlayer={oldPlayerIndex}
-        />
+                <PlayerTable players={players} activePlayer={activePlayer} />
       </div>
-      <CurrentPlayerMobile
-        players={players}
-        activePlayer={activePlayer}
-        playerData={players}
-        currentPlayer={oldPlayerIndex}
-      />
+      <CurrentPlayerMobile players={players} activePlayer={activePlayer} />
       <DiceSectionMobile locked={computer.isComputerTurn} />
 
-      <StatsSection
-        players={players}
-        activePlayer={activePlayer}
-        playerData={players}
-        currentPlayer={oldPlayerIndex}
-      />
-      <StatsSectionMobile
-        players={players}
-        activePlayer={activePlayer}
-        playerData={players}
-        currentPlayer={oldPlayerIndex}
-      />
-      {phase === PHASE.WON ? (
-        // TODO(T6): GameOver will read winner/leaderboard from useGameSession() itself.
-        <GameOver
-          playerData={leaderboard}
-          currentPlayer={oldPlayerIndex}
-          setIsContinue={setIsContinue}
-        />
-      ) : null}
+      <StatsSection players={players} activePlayer={activePlayer} />
+      <StatsSectionMobile players={players} activePlayer={activePlayer} />
+      {phase === PHASE.WON ? <GameOver /> : null}
     </div>
   );
 }

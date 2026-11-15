@@ -64,9 +64,15 @@ async function saveGameLog(ctx, input) {
     if (!Number.isInteger(turn.seat) || turn.seat < 0 || turn.seat >= players.length) {
       throw new Error(`Turn ${turnIndex + 1} has a seat outside the player range`);
     }
-    if (!turn.rolls.length) throw new Error(`Turn ${turnIndex + 1} must contain a roll`);
     if (!Number.isInteger(turn.pointsBanked) || turn.pointsBanked < 0) {
       throw new Error(`Turn ${turnIndex + 1} has invalid pointsBanked`);
+    }
+    // Passing before rolling is a valid zero-point banked turn.
+    if (
+      turn.rolls.length === 0 &&
+      (turn.outcome !== "banked" || turn.pointsBanked !== 0)
+    ) {
+      throw new Error(`Turn ${turnIndex + 1} without rolls must bank zero points`);
     }
     for (const roll of turn.rolls) {
       if (roll.length !== expectedDiceCount) {
@@ -77,10 +83,12 @@ async function saveGameLog(ctx, input) {
       }
     }
 
-    const lastRoll = turn.rolls[turn.rolls.length - 1];
     let expectedPoints = 0;
     let expectedOutcome = "banked";
-    if (input.mode === "classic") {
+    if (turn.rolls.length === 0) {
+      // No roll means the player passed immediately, so nothing was banked.
+    } else if (input.mode === "classic") {
+      const lastRoll = turn.rolls[turn.rolls.length - 1];
       if (turn.rolls.slice(0, -1).some((roll) => roll[0] === 1)) {
         throw new Error(`Turn ${turnIndex + 1} rolled a 1 before its last roll`);
       }
@@ -89,6 +97,7 @@ async function saveGameLog(ctx, input) {
         expectedPoints = turn.rolls.reduce((sum, roll) => sum + roll[0], 0);
       }
     } else {
+      const lastRoll = turn.rolls[turn.rolls.length - 1];
       const firstOne = turn.rolls.findIndex((roll) => roll.includes(1));
       if (firstOne !== -1 && firstOne !== turn.rolls.length - 1) {
         throw new Error(`Turn ${turnIndex + 1} rolled a 1 before its last roll`);

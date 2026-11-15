@@ -134,6 +134,7 @@ async function saveGameLog(ctx, input) {
     winnerSeat: log.winnerSeat,
     luckiestSeat: stats.luckiestSeat,
     bestRiskTakerSeat: stats.bestRiskTakerSeat,
+    extraAwards: stats.extraAwards,
     finishedAt: Date.now(),
     turns: log.turns,
   });
@@ -204,6 +205,7 @@ export const seedFakeGame = internalMutation({
     turns: [
       { seat: 0, rolls: [[4], [5]], outcome: "banked", pointsBanked: 9 },
       { seat: 1, rolls: [[2], [1]], outcome: "bust", pointsBanked: 0 },
+      { seat: 1, rolls: [[4], [5], [1]], outcome: "bust", pointsBanked: 0 },
       { seat: 2, rolls: [[6], [2], [3]], outcome: "banked", pointsBanked: 11 },
       { seat: 3, rolls: [[5], [6]], outcome: "banked", pointsBanked: 11 },
       { seat: 0, rolls: [[6], [4]], outcome: "banked", pointsBanked: 10 },
@@ -214,5 +216,22 @@ export const seedFakeGame = internalMutation({
       { seat: 3, rolls: [[6], [6], [6], [6]], outcome: "banked", pointsBanked: 24 },
     ],
     winnerSeat: 3,
+  }).then(async (classicGameId) => {
+    const doubleJeopardyGameId = await saveGameLog(ctx, {
+      clientGameId: "fake-stats-game-double-jeopardy",
+      mode: "double_jeopardy",
+      targetScore: 50,
+      players: [
+        { seat: 0, name: "Efe" },
+        { seat: 1, name: "Fola" },
+      ],
+      turns: [
+        { seat: 0, rolls: [[4, 5], [1, 3]], outcome: "banked", pointsBanked: 9 },
+        { seat: 1, rolls: [[6, 6], [6, 5], [1, 2]], outcome: "bust", pointsBanked: 0 },
+        { seat: 0, rolls: [[6, 6], [6, 6], [6, 6], [6, 6]], outcome: "banked", pointsBanked: 48 },
+      ],
+      winnerSeat: 0,
+    });
+    return { classicGameId, doubleJeopardyGameId };
   }),
 });

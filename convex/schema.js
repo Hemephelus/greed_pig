@@ -53,6 +53,11 @@ export default defineSchema({
     winnerSeat: v.number(),
     luckiestSeat: v.optional(v.number()),
     bestRiskTakerSeat: v.optional(v.number()),
+    extraAwards: v.optional(v.array(v.object({
+      key: v.string(),
+      seat: v.number(),
+      value: v.number(),
+    }))),
     finishedAt: v.number(),
     turns: v.array(
       v.object({

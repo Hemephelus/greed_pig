@@ -136,6 +136,29 @@ function GameOver({ playerData, currentPlayer, setIsContinue }) {
             ) : (
               <>
                 <div className="mb-5 grid gap-3 sm:grid-cols-2">
+                {(() => {
+                  const awardDetails = {
+                    cursed: { title: "Cursed", description: "Highest share of rolls that ended in a bust", value: (value) => `${(value * 100).toFixed(0)}% bust rate` },
+                    jackpot: { title: "Jackpot", description: "Biggest single turn banked", value: (value) => `${value} points` },
+                    heartbreaker: { title: "Heartbreaker", description: "Most points lost in a single bust", value: (value) => `${value} points lost` },
+                    closeCall: { title: "Close Call", description: "Most turns saved by rolling a 1 and a 3", value: (value) => `${value} ${value === 1 ? "turn" : "turns"} saved` },
+                  };
+                  return savedStats.game.extraAwards?.map((award) => {
+                    const details = awardDetails[award.key];
+                    const player = savedStats.players.find((entry) => entry.seat === award.seat);
+                    if (!details || !player) return null;
+                    return (
+                      <article key={award.key} className="rounded-lg border border-[#ffffff40] bg-[#ffffff10] p-4">
+                        <h3 className="pri-font text-xl text-[#D30CBD]">{details.title}</h3>
+                        <p className="sec-font">{player.name}</p>
+                        <p className="pri-font">{details.value(award.value)}</p>
+                        <p className="text-sm text-white/70">{details.description}</p>
+                      </article>
+                    );
+                  });
+                })()}
+                </div>
+                <div className="mb-5 grid gap-3 sm:grid-cols-2">
                   <p className="rounded-lg border border-[#D30CBD80] bg-[#D30CBD15] px-4 py-3">
                     Luckiest: {savedStats.players.find((player) => player.seat === savedStats.game.luckiestSeat)?.name ?? "—"}
                   </p>

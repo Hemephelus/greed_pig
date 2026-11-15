@@ -4,7 +4,8 @@ import PropTypes from "prop-types";
 export default function LuckyShield({ player }) {
   if (!player) return null;
 
-  const streak = player.consecutiveRolls ?? 0;
+  // Server sends consecutive_rolls; the old local game used consecutiveRolls
+  const streak = player.consecutive_rolls ?? player.consecutiveRolls ?? 0;
   const shields = player.shields ?? 0;
 
   return (
@@ -53,6 +54,7 @@ export default function LuckyShield({ player }) {
 
 LuckyShield.propTypes = {
   player: PropTypes.shape({
+    consecutive_rolls: PropTypes.number,
     consecutiveRolls: PropTypes.number,
     shields: PropTypes.number,
   }),

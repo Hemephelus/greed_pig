@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Navbar from "src/components/Navbar";
 import { useLiveGameContext } from "src/context/useLiveGameContext";
 import PlayerTable from "./components/PlayerTable";
@@ -10,68 +10,24 @@ import CurrentPlayerMobile from "./components/CurrentPlayerMobile";
 import DiceSectionMobile from "./components/DiceSectionMobile";
 import ShieldDecisionModal from "src/components/ShieldDecisionModal";
 
-import {
-  handleShieldDecision,
-} from "src/utils/live_game/luckyShield";
+import useServerGameActions from "src/hooks/useServerGameActions";
 
 export default function LiveGame() {
   const {
-  playerData,
-  setPlayerData,
-  currentPlayer,
-  setCurrentPlayer,
-  isGameOver,
-  setIsGameOver,
-  maxPoints,
-  setIsContinue,
-  pendingShieldPlayer,
-  setPendingShieldPlayer,
-} = useLiveGameContext();
+    playerData,
+    currentPlayer,
+    isGameOver,
+    setIsContinue,
+    pendingShieldPlayer,
+  } = useLiveGameContext();
+
+  // The shield decision is sent to the server, which ends the turn
+  const { decideShield, isBusy, error } = useServerGameActions();
 
   useEffect(() => {
     setIsContinue(true)
   }, [])
 
-  
-function resolveShieldDecision(useShield) {
-  if (pendingShieldPlayer === null) return;
-
-  const cp = pendingShieldPlayer;
-
-  try {
-    const result = handleShieldDecision(
-      playerData[cp],
-      useShield
-    );
-
-    const updatedPlayers = [...playerData];
-    updatedPlayers[cp] = result.player;
-
-    setPlayerData(updatedPlayers);
-
-    // Close the decision popup
-    setPendingShieldPlayer(null);
-
-    if (
-      useShield &&
-      result.player.total_points >= maxPoints
-    ) {
-      setIsGameOver(true);
-      return;
-    }
-
-    // Both options end the turn
-    const nextPlayer =
-      (cp + 1) % updatedPlayers.length;
-
-    setCurrentPlayer(nextPlayer);
-  } catch (error) {
-    console.error(error);
-    alert(error.message);
-  }
-}
-
-  
   return (
     <div className="md:grid md:grid-cols-[minmax(auto,_200px)_1fr_minmax(auto,_200px)] lg:grid-cols-[minmax(auto,_250px)_1fr_minmax(auto,_250px)] xl:grid-cols-[auto_1fr_minmax(auto,_300px)] relative">
       <DiceSection />
@@ -92,8 +48,10 @@ function resolveShieldDecision(useShield) {
       {pendingShieldPlayer !== null && (
       <ShieldDecisionModal
         player={playerData[pendingShieldPlayer]}
-        onUseShield={() => resolveShieldDecision(true)}
-        onDecline={() => resolveShieldDecision(false)}
+        onUseShield={() => decideShield(true)}
+        onDecline={() => decideShield(false)}
+        isBusy={isBusy}
+        error={error}
       />
       )}
     </div>

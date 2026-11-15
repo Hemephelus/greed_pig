@@ -32,6 +32,8 @@ export default function LiveGame() {
   // game over) ignores it. Game keys pause while the help overlay is open.
   const { setHasSound } = useGreedyPigContext();
   const [helpOpen, setHelpOpen] = useState(false);
+  // True while the Muddy Trotters target picker is open (K2): it has its own keys
+  const [pickerOpen, setPickerOpen] = useState(false);
   useGameShortcuts(
     SHORTCUTS.game,
     {
@@ -43,7 +45,7 @@ export default function LiveGame() {
       toggleSound: () => setHasSound((on) => !on),
       toggleHelp: () => setHelpOpen((open) => !open),
     },
-    { enabled: phase === PHASE.PLAYING && !helpOpen }
+    { enabled: phase === PHASE.PLAYING && !helpOpen && !pickerOpen }
   );
 
   // Load the game named in the URL (first visit, refresh, or a different game ID)
@@ -99,7 +101,7 @@ export default function LiveGame() {
 
   return (
     <div className="md:grid md:grid-cols-[minmax(auto,_200px)_1fr_minmax(auto,_200px)] lg:grid-cols-[minmax(auto,_250px)_1fr_minmax(auto,_250px)] xl:grid-cols-[auto_1fr_minmax(auto,_300px)] relative">
-      <DiceSection locked={computer.isComputerTurn} />
+      <DiceSection locked={computer.isComputerTurn} onPickerChange={setPickerOpen} />
       <div className=" space-y-2 p-2">
         <Navbar />
         <ErrorBanner />
@@ -108,7 +110,7 @@ export default function LiveGame() {
                 <PlayerTable players={players} activePlayer={activePlayer} />
       </div>
       <CurrentPlayerMobile players={players} activePlayer={activePlayer} />
-      <DiceSectionMobile locked={computer.isComputerTurn} />
+      <DiceSectionMobile locked={computer.isComputerTurn} onPickerChange={setPickerOpen} />
 
       <StatsSection players={players} activePlayer={activePlayer} />
       <StatsSectionMobile players={players} activePlayer={activePlayer} />

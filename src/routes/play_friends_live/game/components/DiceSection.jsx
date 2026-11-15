@@ -11,7 +11,7 @@ import PowerUpTray from "src/components/powerups/PowerUpTray";
 import Kbd from "src/components/Kbd";
 import PowerUpFeedback from "src/components/powerups/PowerUpFeedback";
 
-function DiceSection({ locked = false }) {
+function DiceSection({ locked = false, onPickerChange }) {
   const { setChangeBackground } = useLiveGameContext();
   const { bank, isBusy, phase, players, session } = useGameSession();
   const [isRolling, setIsRolling] = useState(false);
@@ -49,7 +49,7 @@ function DiceSection({ locked = false }) {
         setChangeBackground={setChangeBackground}
         locked={locked}
       />
-       <PowerUpTray locked={locked} />
+       <PowerUpTray locked={locked} onOpenChange={onPickerChange} />
       <PowerUpFeedback />
       
       <button

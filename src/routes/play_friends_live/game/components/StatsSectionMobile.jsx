@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useGameSession } from "src/context/GameSessionContext";
+import ComputerBadge from "src/computer/ui/ComputerBadge";
+import StatusBadges from "src/components/powerups/StatusBadges";
 
-function StatsSectionMobile({ playerData, currentPlayer }) {
-  const [leaderBoard, setLeaderBoard] = useState(playerData);
-  useEffect(() => {
-    let newLeaderBoard = [...playerData].sort(
-      (a, b) => (b.total_points + b.running_points) - (a.total_points + a.running_points)
-    );
-    setLeaderBoard(newLeaderBoard);
-  }, [playerData,currentPlayer]);
+function StatsSectionMobile() {
+  const { leaderboard } = useGameSession();
 
   return (
     <section className="border-l-[#ffffff40] border-l sticky top-0 md:hidden grid grid-rows-[auto_auto_1fr] bg-[#00000010] text-[#F9F7E8] overflow-auto">
@@ -17,31 +13,36 @@ function StatsSectionMobile({ playerData, currentPlayer }) {
       <div className=" overflow-y-auto p-2 bg-[#00000010]">
         <table className=" w-full">
           <tbody>
-            {leaderBoard?.map((player, index) => (
+            {leaderboard?.map((player, index) => (
               <tr
                 key={player.id}
                 id={index}
                 className={` ${
                   index === 0
                     ? `bg-[#FFD70010] text-[#FFEA70] border-[#FFD700c0] hover:border-[#FFD700]`
-                    : index === leaderBoard.length - 1
+                    : index === leaderboard.length - 1
                     ? `bg-[#E71D3610] text-[#F17E8C] border-[#E71D36c0] hover:border-[#E71D36]`
                     : `bg-[#ffffff10] text-[#ffffff] border-[#ffffffc0] hover:border-[#ffffff]`
                 } w-full h-[50px] rounded-lg border  duration-300 scroll-mt-[300px] text-base lg:text-lg`}
               >
-                
+
                 <td className=" text-center p-1">{index + 1}</td>
                 <td className="w-[50px]">
                   <figure className={` h-[40px]  p-2 `}>
-                    <img src={player.avatar} />
+                    <img src={player.avatar} alt={player.name} />
                   </figure>
                 </td>
-                <td className=" "> {player.name === ''?player.tag:player.name}</td>
-                <td className="  ">
-                  {player.total_points + player.running_points}
+                <td className=" ">
+                  {" "}
+                  {player.name}
+                  <ComputerBadge player={player} />
+                  <StatusBadges player={player} />
                 </td>
                 <td className="  ">
-                  { player.running_points}
+                  {player.total_score}
+                </td>
+                <td className="  ">
+                  {player.turn_score}
                 </td>
               </tr>
             ))}

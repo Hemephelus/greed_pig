@@ -8,16 +8,16 @@ import addPlayerSound from "src/sound_effect/add_player.mp3";
 import invalidSound from "src/sound_effect/invalid.mp3";
 import useAudio from "src/hooks/useAudio";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
+import { MAX_PLAYERS } from "src/constants/game";
 
 export default function AddPlayerButton() {
-  const MAX_NUMBER_OF_PLAYERS = 8
   const { setPlayerData, playerData } = useLiveGameContext();
   const invalidAudio = useAudio(invalidSound);
   const addPlayerAudio = useAudio(addPlayerSound);
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
   const pigs = preloadSrcList.filter(pig => pig.includes('pig'))
 
-  
+
   function addPlayer() {
     addPlayerAudio?.play()
     const newId = generateId();
@@ -39,7 +39,7 @@ export default function AddPlayerButton() {
   }
 
   function isMax() {
-   return (Object.keys(playerData).length) >= MAX_NUMBER_OF_PLAYERS
+   return (Object.keys(playerData).length) >= MAX_PLAYERS
   }
 
   return (

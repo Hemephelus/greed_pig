@@ -1,6 +1,8 @@
-import React from "react";
+import ComputerBadge from "src/computer/ui/ComputerBadge";
 
-function CurrentPlayerMobile({ playerData, currentPlayer }) {
+function CurrentPlayerMobile({ activePlayer }) {
+  if (!activePlayer) return null;
+
   return (
     <div className="md:hidden flex items-center justify-center text-sm w-full p-2">
       <table className=" w-full">
@@ -10,21 +12,16 @@ function CurrentPlayerMobile({ playerData, currentPlayer }) {
           >
             <td className="w-[50px]">
               <figure className={` h-[40px]  p-2 `}>
-                <img src={playerData[currentPlayer].avatar} />
+                <img src={activePlayer.avatar} alt={activePlayer.name} />
               </figure>
             </td>
             <td className=" ">
               {" "}
-              {playerData[currentPlayer].name === ""
-                ? playerData[currentPlayer].tag
-                : playerData[currentPlayer].name}
-              's Turn
+              {activePlayer.name}&apos;s Turn
+              <ComputerBadge player={activePlayer} />
             </td>
-            <td className="  ">
-              {playerData[currentPlayer].total_points +
-                playerData[currentPlayer].running_points}
-            </td>
-            <td className="  ">{playerData[currentPlayer].running_points}</td>
+            <td className="  ">{activePlayer.total_score}</td>
+            <td className="  ">{activePlayer.turn_score}</td>
           </tr>
         </tbody>
       </table>

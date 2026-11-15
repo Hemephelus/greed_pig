@@ -13,13 +13,13 @@ export default function Home() {
           Greedy Pig
         </h1>
         <div className="flex gap-4 flex-col">
-          {/* <Link
-            to={`/play-computer`}
+          <Link
+            to={`/live-game/vs-computer`}
             className=" sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc] "
           >
             Play Computer
           </Link>
-          <Link
+          {/* <Link
             to={`/play-remote-game`}
             className=" sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 -skew-x-6 hover:bg-[#d30cbc] hover:skew-x-0 hover:scale-95  "
           >

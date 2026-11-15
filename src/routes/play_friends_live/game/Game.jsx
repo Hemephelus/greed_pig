@@ -82,29 +82,13 @@ export default function LiveGame() {
         <ErrorBanner />
         <ComputerStatus computer={computer} />
         <ComputerTurnRecap computer={computer} />
-        <PlayerTable
-          players={players}
-          activePlayer={activePlayer}
-          playerData={players}
-        />
+                <PlayerTable players={players} activePlayer={activePlayer} />
       </div>
-      <CurrentPlayerMobile
-        players={players}
-        activePlayer={activePlayer}
-        playerData={players}
-      />
+      <CurrentPlayerMobile players={players} activePlayer={activePlayer} />
       <DiceSectionMobile locked={computer.isComputerTurn} />
 
-      <StatsSection
-        players={players}
-        activePlayer={activePlayer}
-        playerData={players}
-      />
-      <StatsSectionMobile
-        players={players}
-        activePlayer={activePlayer}
-        playerData={players}
-      />
+      <StatsSection players={players} activePlayer={activePlayer} />
+      <StatsSectionMobile players={players} activePlayer={activePlayer} />
       {phase === PHASE.WON ? <GameOver /> : null}
     </div>
   );

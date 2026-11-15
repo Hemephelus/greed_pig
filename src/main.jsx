@@ -26,12 +26,8 @@ const router = createBrowserRouter([
             path: "setup/",
             element: <LiveGameSetup />,
           },
-          {
-            path: "game/",
-            element: <LiveGame />,
-          },
-          {
-            path: "game/:gameId", // server game (GET /api/game/:game_id)
+                    {
+            path: "game/:gameId", // server game (GET /api/game/:game_id) // server game (GET /api/game/:game_id)
             element: <LiveGame />,
           },
           {

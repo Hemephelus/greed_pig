@@ -6,18 +6,15 @@ import { getInitialPlayerData } from "src/utils/live_game/getInitialData";
 import { GameSessionProvider } from "src/context/GameSessionContext";
 
 function LiveGamePage() {
-  const { preloadSrcList,pigPetNames } = useGreedyPigContext();
-  const [playerData, setPlayerData] = useState(getInitialPlayerData(preloadSrcList.slice(0,9),pigPetNames));
+  const { preloadSrcList, pigPetNames } = useGreedyPigContext();
+  // Setup-form state only. The game itself lives on the server (useGameSession).
+  const [playerData, setPlayerData] = useState(
+    getInitialPlayerData(preloadSrcList.slice(0, 9), pigPetNames)
+  );
   const [maxPoints, setMaxPoints] = useState(100);
-  const [gameHistory, setGameHistory] = useState([]);
-  const [numberRolled, setNumberRolled] = useState(0);
-  const [changeBackground, setChangeBackground] = useState(false); //if the state of the game was still in the running points
-  const [isGameOver, setIsGameOver] = useState(false); 
-  const [isContinue, setIsContinue] = useState(false); 
-  const [isRunning, setIsRunning] = useState("?"); //if the state of the game was still in the running points
-  const [diceValue, setDiceValue] = useState(0);
-  const [currentPlayer, setCurrentPlayer] = useState(0);
-  
+  const [changeBackground, setChangeBackground] = useState(false); // background colour swap while a turn is running
+  const [diceValue, setDiceValue] = useState(0); // 1 turns the background red
+
   return (
     <>
       <main className="bg-[#111111] min-h-screen min-w-full relative z-10 sec-font ">
@@ -35,22 +32,10 @@ function LiveGamePage() {
             setPlayerData,
             maxPoints,
             setMaxPoints,
-            gameHistory,
-            setGameHistory,
-            numberRolled,
-            setNumberRolled,
-            isRunning,
-            setIsRunning,
             changeBackground,
             setChangeBackground,
             diceValue,
             setDiceValue,
-            currentPlayer,
-            setCurrentPlayer,
-            setIsGameOver,
-            isGameOver,
-            isContinue,
-            setIsContinue
           }}
         >
           <GameSessionProvider>

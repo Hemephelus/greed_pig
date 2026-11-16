@@ -8,11 +8,11 @@ Academic session 2026/2027 (First Semester) | **Group 1**
 
 ## Team
 
-| Name | Matric number | Improvement | Category |
-|---|---|---|---|
-| Flourish | `<matric number>` | 1. Game Tutorial | Accessibility and Experience |
-| Esuga | `<matric number>` | 2. Double Jeopardy | Gameplay and Rules |
-| Victoria Falowo | 23120112022 | 3. Game Statistics | Competition |
+| Name            | Matric number     | Improvement        | Category                     |
+| --------------- | ----------------- | ------------------ | ---------------------------- |
+| Flourish        | `<matric number>` | 1. Game Tutorial   | Accessibility and Experience |
+| Esuga           | 24120112061       | 2. Double Jeopardy | Gameplay and Rules           |
+| Victoria Falowo | 23120112022       | 3. Game Statistics | Competition                  |
 
 ## About the project
 
@@ -23,22 +23,24 @@ Base game: <https://greedy-pig.vercel.app/> | Base repo: <https://github.com/Hem
 ## Improvements
 
 1. **Game Tutorial (Accessibility and Experience):**
-2. **Double Jeopardy (Gameplay and Rules):** 
+2. **Double Jeopardy (Gameplay and Rules):**
 3. **Game Statistics (Competition):** .
 
 ---
+
 ## Improvement 1: Game Tutorial
- `<Flourish: add what you built, how it works, and your files here>`
- 
+
+`<Flourish: add what you built, how it works, and your files here>`
+
 ## Improvement 2: Double Jeopardy
- `<The Destroyer: add the rules, how it works, and your files here>`
- 
+
+`<The Destroyer: add the rules, how it works, and your files here>`
 
 ## Improvement 3: Game Statistics (Victoria Falowo, 23120112022)
 
 ### What the player sees
 
-When a game ends, the winner screen offers **Play Again**, **Home** and **View Stats**. 
+When a game ends, the winner screen offers **Play Again**, **Home** and **View Stats**.
 
 **View Stats** opens a popup with:
 
@@ -51,14 +53,14 @@ If the stats can't be saved (for example, the connection drops), the player sees
 
 ### Awards
 
-| Award | Goes to | How it is worked out |
-|---|---|---|
-| **Luckiest** | The player who busted least often | Lowest bust rate (busts divided by rolls) among players with at least 5 rolls. If nobody has 5 rolls, everyone is considered. Ties go to the higher score. |
-| **Risk Taker** | The player who pushed their luck most | Highest average number of rolls per turn. Ties go to the longest streak. |
-| **Cursed** | The unluckiest player | Highest bust rate among players with at least 5 rolls and at least 1 bust. Ties go to the lower score. |
-| **Jackpot** | Biggest single payday | Most points banked in one turn. |
-| **Heartbreaker** | The most painful bust | Most points lost in a single bust (the dice rolled earlier in that turn). |
-| **Close Call** (Double Jeopardy only) | The narrow-save specialist | Most turns saved by rolling a 1 and a 3 together. |
+| Award                                 | Goes to                               | How it is worked out                                                                                                                                       |
+| ------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Luckiest**                          | The player who busted least often     | Lowest bust rate (busts divided by rolls) among players with at least 5 rolls. If nobody has 5 rolls, everyone is considered. Ties go to the higher score. |
+| **Risk Taker**                        | The player who pushed their luck most | Highest average number of rolls per turn. Ties go to the longest streak.                                                                                   |
+| **Cursed**                            | The unluckiest player                 | Highest bust rate among players with at least 5 rolls and at least 1 bust. Ties go to the lower score.                                                     |
+| **Jackpot**                           | Biggest single payday                 | Most points banked in one turn.                                                                                                                            |
+| **Heartbreaker**                      | The most painful bust                 | Most points lost in a single bust (the dice rolled earlier in that turn).                                                                                  |
+| **Close Call** (Double Jeopardy only) | The narrow-save specialist            | Most turns saved by rolling a 1 and a 3 together.                                                                                                          |
 
 ### How it works
 
@@ -76,12 +78,12 @@ If the stats can't be saved (for example, the connection drops), the player sees
 
 **Endpoints** (`convex/stats.js`):
 
-| Function | Type | What it does |
-|---|---|---|
-| `saveGame` | mutation | Validates a finished game's log, calculates the stats and stores them. |
-| `getGameStats` | query | Returns a saved game and its players' stats (returns nothing for an unknown id). |
-| `listRecentGames` | query | Returns the 10 most recent finished games. Not shown in the interface yet. |
-| `seedFakeGame` | internal mutation | Adds two sample games (one per mode) for testing. Run with `npx convex run stats:seedFakeGame`. |
+| Function          | Type              | What it does                                                                                    |
+| ----------------- | ----------------- | ----------------------------------------------------------------------------------------------- |
+| `saveGame`        | mutation          | Validates a finished game's log, calculates the stats and stores them.                          |
+| `getGameStats`    | query             | Returns a saved game and its players' stats (returns nothing for an unknown id).                |
+| `listRecentGames` | query             | Returns the 10 most recent finished games. Not shown in the interface yet.                      |
+| `seedFakeGame`    | internal mutation | Adds two sample games (one per mode) for testing. Run with `npx convex run stats:seedFakeGame`. |
 
 ### Testing
 
@@ -90,8 +92,6 @@ If the stats can't be saved (for example, the connection drops), the player sees
 ---
 
 ## How to run the project
-
-
 
 ### Deployment
 

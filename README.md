@@ -32,9 +32,86 @@ Base game: <https://greedy-pig.vercel.app/> | Base repo: <https://github.com/Hem
 
 `<Flourish: add what you built, how it works, and your files here>`
 
-## Improvement 2: Double Jeopardy
+## Improvement 2: Double Jeopardy (Esuga, 24120112061)
 
-`<The Destroyer: add the rules, how it works, and your files here>`
+### Overview
+
+Double Jeopardy is an alternative game mode that introduces a second dice and additional gameplay mechanics to the original Greedy Pig game. Unlike Classic mode, which uses a single die, Double Jeopardy uses two dice, requiring players to take greater risks when deciding whether to continue rolling or bank their accumulated points.
+
+The main objective remains the same: accumulate points and be the first player to reach the target score. However, the introduction of two dice creates additional possible outcomes and introduces a special combination that allows players to save their accumulated points.
+
+### Game Rules
+
+Double Jeopardy follows these rules:
+
+1. **Rolling the Dice:** Each player rolls two dice during their turn. The values of both dice are added together and credited to their running total.
+2. **Rolling a 1:** If either die lands on a 1, the player busts and loses all the points accumulated during that turn.
+3. **The Special 1 and 3 Combination:** If the player rolls a 1 and a 3 in either order, they are allowed to bank their current running total. Their turn ends immediately, but the 1 and 3 are not added to their score.
+4. **Banking Points:** Players can choose to stop rolling and bank their accumulated points at any time before busting.
+5. **Winning:** The first player to reach the target score wins the game.
+
+The special 1 and 3 combination introduces an additional strategic element, as players can secure their accumulated points even when one of the dice lands on a 1.
+
+### What the Player Sees
+
+When creating a game, players can choose between Classic and Double Jeopardy modes.
+
+Once Double Jeopardy is selected:
+
+- The interface identifies the selected game mode so players know which rules apply.
+- Two dice are displayed and used throughout gameplay.
+- Players can roll, monitor their running total and choose when to bank their points.
+- The game automatically handles the different dice outcomes, including busts and the special 1 and 3 combination.
+- In multiplayer games, turns are automatically managed and passed between players.
+- The game displays the winner once a player reaches the target score.
+
+The mode is supported in both local and online multiplayer games, with the interface adapting to smaller mobile screens.
+
+### Game State Management and Persistence
+
+An important part of the implementation was ensuring that an ongoing Double Jeopardy game could survive a browser refresh without losing its progress.
+
+The game state is maintained through the backend, but the game log used to record individual player actions was initially stored only in browser memory. This meant that refreshing the page could erase the recorded turns even though the game itself could continue.
+
+To address this, browser local storage was introduced to preserve the game log.
+
+The implementation:
+
+1. Saves the game log whenever a player rolls, passes or busts.
+2. Restores the saved log when an ongoing Double Jeopardy game is loaded again.
+3. Ensures that starting a new game creates a fresh log, preventing previous game data from carrying over.
+4. Preserves the complete sequence of turns for the statistics system when the game ends.
+
+This was particularly important for ensuring that completed Double Jeopardy games could be accurately recorded and analysed by the Game Statistics feature.
+
+### Implementation
+
+The Double Jeopardy feature involved changes across several frontend components and the backend.
+
+**Main files worked on:**
+
+| File                         | Responsibility                                                             |
+| ---------------------------- | -------------------------------------------------------------------------- |
+| `DoubleJeopardyGame.jsx`     | Core gameplay logic and handling of dice outcomes.                         |
+| `DoubleJeopardyControls.jsx` | Player controls for interacting with the game.                             |
+| `Game.jsx`                   | Integration of the game mode into the wider gameplay experience.           |
+| `LivePage.jsx`               | Live game management, game-state handling and persistence of the game log. |
+| `GameOver.jsx`               | Handling the end of a game and displaying the winner.                      |
+
+The backend was configured using Convex to support the application's multiplayer functionality and game-state management. Particular attention was given to ensuring that the development and production environments were correctly configured and that the application was connected to the appropriate Convex deployment.
+
+### Testing and Challenges
+
+Several issues were encountered and resolved during development:
+
+- **Special Dice Combination:** Initially, rolling a 1 and a 3 did not correctly bank the player's accumulated points. The game logic was revisited to ensure that the special combination ended the turn while preserving the running total.
+- **Final Roll Registration:** The game initially announced a winner without correctly accounting for the final roll. This was corrected to ensure that the final gameplay action was properly registered before the game ended. This was also important for the accuracy of the statistics feature.
+- **Game Log Persistence:** The original implementation lost the game log when a browser was refreshed. Local storage was introduced to preserve the recorded turns throughout an ongoing game.
+- **Backend and Deployment Configuration:** Configuring Convex and ensuring that all team members were working with the correct deployment environment presented some challenges. At one point, the feature was not appearing on the live Vercel deployment because the application was connected to the wrong deployment environment.
+
+Testing was carried out using different dice combinations, player counts and gameplay scenarios. This included testing busts, the special 1 and 3 combination, banking points, turn rotation, browser refreshes during ongoing games and completing games to verify that the winner and final game statistics were correctly recorded.
+
+These tests helped ensure that Double Jeopardy worked as expected and remained compatible with the existing Classic game mode.
 
 ## Improvement 3: Game Statistics (Victoria Falowo, 23120112022)
 

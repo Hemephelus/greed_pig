@@ -231,6 +231,14 @@ export function GameSessionProvider({ children }) {
 
   const value = useMemo(() => {
     const activePlayer = getActivePlayer(players, state.session);
+    // Play vs Computer is its own mode: no power-ups (the computer has no
+    // logic for them), and no route back to the friends setup page.
+    const isVsComputer = Object.keys(state.computers).length > 0;
+    // The server still awards a Comeback power-up on a big bust; hide that
+    // sentence so the message matches the tray-less screen.
+    const message = isVsComputer
+      ? state.message?.replace(/\s*Comeback: earned an? [^!]+!/, "") ?? state.message
+      : state.message;
     return {
       // raw state
       phase: state.phase,
@@ -241,14 +249,14 @@ export function GameSessionProvider({ children }) {
       lastPowerupEarned: state.lastPowerupEarned,
       lastPowerupUsed: state.lastPowerupUsed,
       sniffResult: state.sniffResult,
-      message: state.message,
+      message,
       isBusy: state.isBusy,
+      isVsComputer,
       error: state.error,
       // UI-ready
       players,
       activePlayer,
-      usablePowerups: getUsablePowerups(activePlayer, state.session),
-      leaderboard: getLeaderboard(players),
+      usablePowerups: isVsComputer ? [] : getUsablePowerups(activePlayer, state.session),      leaderboard: getLeaderboard(players),
       winner: getWinner(state.winner, players),
       savedGame: loadCurrentGame(),
       // actions

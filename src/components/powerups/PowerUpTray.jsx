@@ -31,7 +31,7 @@ function blockedReason({ powerup, activePlayer, session, phase, isBusy, locked }
 // onOpenChange(isOpen) fires when the target picker opens or closes, so the
 // game's keyboard shortcuts can pause while it is up (K2).
 export default function PowerUpTray({ locked = false, onOpenChange, variant = "stack" }) {
-  const { activePlayer, players, session, phase, isBusy, activatePowerup } =
+  const { activePlayer, players, session, phase, isBusy, activatePowerup, isVsComputer } =
     useGameSession();
   const inFlight = useRef(false);
   // The Muddy Trotters waiting for a target, or null
@@ -46,6 +46,8 @@ export default function PowerUpTray({ locked = false, onOpenChange, variant = "s
     if (pending && (locked || phase !== PHASE.PLAYING)) setPending(null);
   }, [pending, locked, phase]);
 
+  // Power-ups are a pass-and-play feature; the vs-computer mode has none.
+  if (isVsComputer) return null;
   if (!activePlayer) return null;
 
   const held = (activePlayer.powerups ?? []).slice(0, MAX_POWERUPS_HELD);

@@ -3,8 +3,12 @@ import { HiOutlineMenu } from "react-icons/hi";
 import { GoTools } from "react-icons/go";
 import { Link } from "react-router-dom";
 import SoundSwitch from "src/components/SoundSwitch";
+import { useGameSession } from "src/context/GameSessionContext";
 
 function Menu() {
+  // The Setup tile leads to the friends setup page, which is wrong for a
+  // vs-computer game, so that mode gets only the Sound tile.
+  const { isVsComputer } = useGameSession();
   return (
     <div className="group flex flex-col items-center gap-2 hover:cursor-pointer text-sm relative">
       <div className="flex  gap-2 group-hover:scale-100 scale-0 delay-300 duration-500 bg-[#D30CBD] bottom-0 md:bg-[#D30CBD40] p-2 rounded-lg absolute w-[150px] m-auto">
@@ -24,19 +28,21 @@ function Menu() {
             <BiRedo size={24} /> Redo
           </button>
         </div> */}
-        <div  className="grid grid-cols-2 gap-2 w-full">
-          <Link
-            to={`/live-game/setup`}
-            className=" bg-[#ffffff40] hover:bg-[#ffffff80] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
-            title="Setup"
-          >
-            {" "}
-            <GoTools size={24} />
-            Setup
-          </Link>
+        <div className={`grid gap-2 w-full ${isVsComputer ? "grid-cols-1" : "grid-cols-2"}`}>
+          {!isVsComputer ? (
+            <Link
+              to={`/live-game/setup`}
+              className=" bg-[#ffffff40] hover:bg-[#ffffff80] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
+              title="Setup"
+            >
+              {" "}
+              <GoTools size={24} />
+              Setup
+            </Link>
+          ) : null}
           <div
             className=" bg-[#ffffff40] hover:bg-[#ffffff80] text-white rounded-lg flex flex-col gap-2 p-2 justify-end items-center hover:scale-105 active:scale-100 duration-300"
-            title="Setup"
+            title="Sound"
           >
            <SoundSwitch/> Sound
           </div>

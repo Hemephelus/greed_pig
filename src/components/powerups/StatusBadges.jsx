@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { POWERUP_TYPES } from "src/constants/game";
 import { POWERUP_INFO } from "src/constants/powerups";
+import { useGameSession } from "src/context/GameSessionContext";
 
 const CHIP =
   "inline-flex items-center gap-1 text-[10px] leading-none px-1.5 py-0.5 rounded-full border align-middle ml-1";
@@ -8,7 +9,9 @@ const CHIP =
 // Small chips beside a player's name: Mud Bath armed, next bank halved, and how
 // many power-ups they hold. A player with nothing to show gets nothing.
 export default function StatusBadges({ player }) {
-  if (!player) return null;
+  const { isVsComputer } = useGameSession();
+  // No power-ups in the vs-computer mode, so no chips either
+  if (isVsComputer || !player) return null;
 
   const held = player.powerups?.length ?? 0;
   const mudBath = Boolean(player.mud_bath_active);

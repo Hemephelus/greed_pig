@@ -36,8 +36,8 @@ const PILL =
 //   - a Truffle Sniff answer is waiting (stays until the next roll)
 //   - Muddy Trotters halved a bank
 export default function PowerUpFeedback() {
-  const { lastPowerupEarned, lastBank, sniffResult, players } = useGameSession();
-
+  const { lastPowerupEarned, lastBank, sniffResult, players, isVsComputer } =
+    useGameSession();
   const earned = useFlash(lastPowerupEarned?.id ?? null, lastPowerupEarned);
   // A bust passes the turn, so the tray on screen is the next player's.
   // Name the earner: the player whose tray the new power-up landed in.
@@ -49,7 +49,7 @@ export default function PowerUpFeedback() {
   const sniffInfo = POWERUP_INFO[POWERUP_TYPES.TRUFFLE_SNIFF];
   const trottersInfo = POWERUP_INFO[POWERUP_TYPES.MUDDY_TROTTERS];
 
-  if (!earned && !sniffResult && !halved) return null;
+  if (isVsComputer || (!earned && !sniffResult && !halved)) return null;
 
   return (
     <div className="flex w-full flex-col gap-1" aria-live="polite">

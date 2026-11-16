@@ -13,6 +13,16 @@ import {
 
 const SAVED_GAME_KEY = "greedyPig.doubleJeopardyGame";
 
+const SAVED_LOG_KEY = "greedyPig.doubleJeopardyLog";
+
+function loadSavedLog() {
+  try {
+    const log = JSON.parse(localStorage.getItem(SAVED_LOG_KEY));
+    return log && log.mode === "double_jeopardy" ? log : null;
+  } catch {
+    return null;
+  }
+}
 // Read the saved game, but only trust it if it belongs to this Convex deployment.
 function loadSavedGame() {
   try {
@@ -52,40 +62,42 @@ function LiveGamePage() {
     savedGame ? "double_jeopardy" : "classic",
   );
   const [gameId, setGameId] = useState(savedGame ? savedGame.gameId : null);
-  const gameLogRef = useRef(null);
+  const [initialLog] = useState(() => (savedGame ? loadSavedLog() : null));
+  const gameLogRef = useRef(initialLog);
 
-  function startGameLog({ mode = "classic", targetScore, players }) {
-    gameLogRef.current = createGameLog({
-      clientGameId: generateId(),
-      mode,
-      targetScore: Number(targetScore),
-      players,
-    });
+  function updateGameLog(nextLog) {
+    gameLogRef.current = nextLog;
+    try {
+      localStorage.setItem(SAVED_LOG_KEY, JSON.stringify(nextLog));
+    } catch {
+      // Ignore storage errors; the log just won't survive a refresh.
+    }
   }
 
-  function logRoll(seat, dice, busted) {
-    gameLogRef.current = addRollToGameLog(
-      gameLogRef.current,
-      seat,
-      dice,
-      busted,
+  function startGameLog({ mode = "classic", targetScore, players }) {
+    updateGameLog(
+      createGameLog({
+        clientGameId: generateId(),
+        mode,
+        targetScore: Number(targetScore),
+        players,
+      }),
     );
   }
 
+  function logRoll(seat, dice, busted) {
+    updateGameLog(addRollToGameLog(gameLogRef.current, seat, dice, busted));
+  }
+
   function logPass(seat, pointsBanked) {
-    gameLogRef.current = closeGameLogTurn(
-      gameLogRef.current,
-      seat,
-      "banked",
-      pointsBanked,
+    updateGameLog(
+      closeGameLogTurn(gameLogRef.current, seat, "banked", pointsBanked),
     );
   }
 
   function finishGameLog(winnerSeat, winnerRunningPoints) {
-    gameLogRef.current = finishLog(
-      gameLogRef.current,
-      winnerSeat,
-      winnerRunningPoints,
+    updateGameLog(
+      finishLog(gameLogRef.current, winnerSeat, winnerRunningPoints),
     );
   }
 

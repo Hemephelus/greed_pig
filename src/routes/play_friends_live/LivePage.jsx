@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useGreedyPigContext } from "src/context/useGreedyPigContext";
 import { LiveGameContext } from "src/context/useLiveGameContext";
@@ -10,6 +10,27 @@ import {
   createGameLog,
   finishGameLog as finishLog,
 } from "src/utils/live_game/gameLog";
+
+const SAVED_GAME_KEY = "greedyPig.doubleJeopardyGame";
+
+// Read the saved game, but only trust it if it belongs to this Convex deployment.
+function loadSavedGame() {
+  try {
+    const raw = localStorage.getItem(SAVED_GAME_KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw);
+    if (
+      saved.mode === "double_jeopardy" &&
+      typeof saved.gameId === "string" &&
+      saved.deployment === import.meta.env.VITE_CONVEX_URL
+    ) {
+      return saved;
+    }
+  } catch {
+    // Storage can be blocked or corrupted; start fresh.
+  }
+  return null;
+}
 
 function LiveGamePage() {
   const { preloadSrcList, pigPetNames } = useGreedyPigContext();
@@ -26,8 +47,11 @@ function LiveGamePage() {
   const [diceValue, setDiceValue] = useState(0);
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [gameMode, setGameMode] = useState("classic"); // "classic" | "double_jeopardy"
-  const [activeMode, setActiveMode] = useState("classic");
-  const [gameId, setGameId] = useState(null); // Convex game id (Double Jeopardy only)
+  const [savedGame] = useState(loadSavedGame);
+  const [activeMode, setActiveMode] = useState(
+    savedGame ? "double_jeopardy" : "classic",
+  );
+  const [gameId, setGameId] = useState(savedGame ? savedGame.gameId : null);
   const gameLogRef = useRef(null);
 
   function startGameLog({ mode = "classic", targetScore, players }) {
@@ -68,6 +92,25 @@ function LiveGamePage() {
   function getGameLog() {
     return gameLogRef.current;
   }
+
+  useEffect(() => {
+    try {
+      if (activeMode === "double_jeopardy" && gameId) {
+        localStorage.setItem(
+          SAVED_GAME_KEY,
+          JSON.stringify({
+            mode: "double_jeopardy",
+            gameId,
+            deployment: import.meta.env.VITE_CONVEX_URL,
+          }),
+        );
+      } else {
+        localStorage.removeItem(SAVED_GAME_KEY);
+      }
+    } catch {
+      // Ignore storage errors; the game still works without refresh support.
+    }
+  }, [activeMode, gameId]);
 
   return (
     <>

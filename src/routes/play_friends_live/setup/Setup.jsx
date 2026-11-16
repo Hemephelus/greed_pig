@@ -255,8 +255,8 @@ function LiveGameSetup() {
               <h2 id="tutorial-choice-title" className="pri-font text-2xl sm:text-3xl">Learn {gameMode === "classic" ? "Classic" : "Double Jeopardy"} first?</h2>
               <p className="my-4">Try a short guided game, or skip the tutorial and start your game now.</p>
               <div className="flex flex-col sm:flex-row justify-center gap-3">
-                <button type="button" onClick={takeTutorial} className="rounded-lg bg-[#D30CBD] px-6 py-3 font-bold hover:bg-[#d30cbc]">Take Tutorial</button>
-                <button type="button" onClick={skipTutorial} className="rounded-lg border border-[#ffffff60] bg-[#ffffff10] px-6 py-3 font-bold hover:bg-[#ffffff20]">Skip Tutorial</button>
+                <button type="button" onClick={takeTutorial} className="skew-x-6 rounded-lg bg-[#D30CBD] px-6 py-3 font-bold duration-500 hover:scale-95 hover:skew-x-0 hover:bg-[#d30cbc]">Take Tutorial</button>
+                <button type="button" onClick={skipTutorial} className="skew-x-6 rounded-lg border border-[#ffffff60] bg-[#ffffff10] px-6 py-3 font-bold duration-500 hover:scale-95 hover:skew-x-0 hover:bg-[#ffffff20]">Skip Tutorial</button>
               </div>
             </section>
           </div>

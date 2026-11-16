@@ -336,7 +336,7 @@ export default function DoubleJeopardyTutorial() {
           <p>{instruction}</p>
           <p className="mt-2 text-sm opacity-80">Running points: {playerData[currentPlayer].running_points} · Total points: {playerData[currentPlayer].total_points} · Target: {targetScore}</p>
           {showWinSetup && (
-            <button type="button" onClick={startWinningExample} className="mt-4 rounded-lg bg-[#D30CBD] px-5 py-3 font-bold ring-4 ring-[#FFEA70] hover:bg-[#d30cbc]">
+            <button type="button" onClick={startWinningExample} className="mt-4 skew-x-6 rounded-lg bg-[#D30CBD] px-5 py-3 font-bold ring-4 ring-[#FFEA70] duration-500 hover:scale-95 hover:skew-x-0 hover:bg-[#d30cbc]">
               Continue to the winning example
             </button>
           )}
@@ -368,7 +368,7 @@ export default function DoubleJeopardyTutorial() {
             >
               Start my Double Jeopardy game
             </Link>
-            <Link to="/live-game/setup" replace className="rounded bg-[#d30cbcc0] px-8 py-4 text-center text-xl font-bold duration-500 hover:scale-95 hover:skew-x-0 hover:bg-[#d30cbc]">Exit to setup instead</Link>
+            <Link to="/live-game/setup" replace className="skew-x-6 rounded bg-[#d30cbcc0] px-8 py-4 text-center text-xl font-bold duration-500 hover:scale-95 hover:skew-x-0 hover:bg-[#d30cbc]">Exit to setup instead</Link>
             <button type="button" onClick={restart} className="underline">Replay tutorial</button>
           </section>
         </div>

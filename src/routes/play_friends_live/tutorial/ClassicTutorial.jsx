@@ -161,7 +161,7 @@ export default function ClassicTutorial() {
           <p>{message}</p>
           <p className="text-sm mt-2 opacity-80">Die: {diceValue || "—"} · Running points: {players[currentPlayer].running_points} · Total points: {players[currentPlayer].total_points + players[currentPlayer].running_points}</p>
           {isWinStage && !isComplete && <p className="mt-2 text-[#FFEA70]">You are at 96 points. You need 4 on the next roll to finish the game; click the die to roll.</p>}
-          {showWinningSetup && <button type="button" onClick={startWinningExample} className="mt-4 bg-[#D30CBD] hover:bg-[#d30cbc] font-bold px-5 py-3 rounded-lg">Continue to the 100-point example</button>}
+          {showWinningSetup && <button type="button" onClick={startWinningExample} className="mt-4 skew-x-6 bg-[#D30CBD] hover:bg-[#d30cbc] font-bold px-5 py-3 rounded-lg duration-500 hover:scale-95 hover:skew-x-0">Continue to the 100-point example</button>}
           <div className="md:hidden flex flex-col items-center gap-3 mt-4">
             <p className="text-sm">{rollPrompt}</p>
             <Dice getFinalDiceValue={handleRoll} getRollValue={getNextRoll} setIsRolling={setIsRollingMobile} isRolling={isRollingMobile} setChangeBackground={() => {}} disabled={!canRoll} buttonClassName={canRoll ? "ring-4 ring-[#FFEA70] rounded-lg" : ""} />
@@ -191,7 +191,7 @@ export default function ClassicTutorial() {
             >
               Start game
             </Link>
-            <Link to="/live-game/setup" replace className="text-center sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 -skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc]">Exit to setup instead</Link>
+            <Link to="/live-game/setup" replace className="text-center sec-font text-xl rounded px-8 py-4 bg-[#d30cbcc0] font-bold duration-500 skew-x-6 hover:skew-x-0 hover:scale-95 hover:bg-[#d30cbc]">Exit to setup instead</Link>
           </section>
         </div>
       )}

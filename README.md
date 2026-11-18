@@ -38,7 +38,7 @@ Base game: <https://greedy-pig.vercel.app/> | Base repo: <https://github.com/Hem
 
 Double Jeopardy is an alternative game mode that introduces a second dice and additional gameplay mechanics to the original Greedy Pig game. Unlike Classic mode, which uses a single die, Double Jeopardy uses two dice, requiring players to take greater risks when deciding whether to continue rolling or bank their accumulated points.
 
-The main objective remains the same: accumulate points and be the first player to reach the target score. However, the introduction of two dice creates additional possible outcomes and introduces a special combination that allows players to save their accumulated points.
+The main objective remains the very same: accumulate points and be the first player to reach the target score. However, the introduction of two dice creates additional possible outcomes and introduces a special combination that allows players to save their accumulated points.
 
 ### Game Rules
 
